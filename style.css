@@ -212,13 +212,13 @@ body {
 }
 
 .card.back {
-  font-size: 12px;
+  font-size: 9px;
 }
 
 .card.back .pinyin {
-  font-size: 16px;
+  font-size: 11px;
   font-weight: bold;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 /* ================= PRINT STYLES ================= */
@@ -250,10 +250,10 @@ body {
   }
 
   .card.back {
-    font-size: 14px;
+    font-size: 10px;
   }
 
   .card.back .pinyin {
-    font-size: 18px;
+    font-size: 12px;
   }
 }
