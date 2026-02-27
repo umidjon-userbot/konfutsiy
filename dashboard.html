@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcard Dashboard</title>
+
+<style>
+body{margin:0;font-family:Arial;background:#f3f4f6;}
+.header{
+  background:#111;
+  color:white;
+  padding:10px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+button{
+  padding:6px 12px;
+  border:none;
+  background:#2563eb;
+  color:white;
+  border-radius:6px;
+  cursor:pointer;
+}
+button:hover{opacity:.9;}
+.main{padding:30px;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <span id="userInfo">Yuklanmoqda...</span>
+  <button onclick="logout()">Logout</button>
+</div>
+
+<div class="main">
+  <h2>Asosiy Flashcard Menu 🚀</h2>
+  <p>Endi siz login qilgansiz.</p>
+  <button onclick="openApp()">Flashcardni ochish</button>
+</div>
+
+<script type="module">
+import { requireAuth, logout, setUserInfo } from "./auth.js";
+
+requireAuth("index.html");
+setUserInfo("userInfo");
+
+window.logout = logout;
+
+window.openApp = () => {
+  window.location.href = "index-2.html";
+};
+</script>
+
+</body>
+</html>
