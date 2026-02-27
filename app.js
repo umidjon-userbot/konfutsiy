@@ -8,6 +8,10 @@ let selected=[];
 
 // ======= TELEGRAM LOGIN =======
 
+
+
+// ===== TELEGRAM LOGIN SYSTEM =====
+
 function saveSession(user){
   localStorage.setItem("tg_user", JSON.stringify(user));
 }
@@ -22,11 +26,14 @@ function showApp(){
 }
 
 function sendLoginToBot(user){
-  const device=navigator.userAgent;
-  const text=`LOGIN
-Name: ${user.first_name}
+  const device = navigator.userAgent;
+
+  const text =
+`LOGIN
+Name: ${user.first_name || ""}
+Last: ${user.last_name || ""}
 ID: ${user.id}
-Username: @${user.username||"none"}
+Username: @${user.username || "none"}
 Device: ${device}
 Time: ${new Date().toLocaleString()}`;
 
@@ -34,10 +41,56 @@ Time: ${new Date().toLocaleString()}`;
     method:"POST",
     headers:{ "Content-Type":"application/json"},
     body:JSON.stringify({
-      chat_id:CHAT_ID,
-      text:text
+      chat_id: CHAT_ID,
+      text: text
     })
   });
+}
+
+function normalizeUser(user){
+  const existing = getSession();
+  if(!existing || existing.id !== user.id){
+    saveSession(user);
+    sendLoginToBot(user);
+  }
+  showApp();
+}
+
+function loadWidget(){
+  const container = document.getElementById("widgetContainer");
+
+  const script = document.createElement("script");
+  script.src = "https://telegram.org/js/telegram-widget.js?22";
+  script.async = true;
+  script.setAttribute("data-telegram-login","hskFlash_cardsbot");
+  script.setAttribute("data-size","large");
+  script.setAttribute("data-request-access","write");
+
+  window.onTelegramAuth = function(user){
+    normalizeUser(user);
+  };
+
+  script.setAttribute("data-onauth","onTelegramAuth(user)");
+
+  container.appendChild(script);
+}
+
+// ===== AUTO DETECT MODE =====
+
+if(window.Telegram && window.Telegram.WebApp){
+  const tg = window.Telegram.WebApp;
+  tg.ready();
+  const user = tg.initDataUnsafe?.user;
+  if(user){
+    normalizeUser(user);
+  }
+}else{
+  const session = getSession();
+  if(session){
+    showApp();
+  }else{
+    loadWidget();
+  }
 }
 
 function normalizeUser(user){
