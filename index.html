@@ -8,34 +8,45 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
 <h2 class="no-print">Flashcard 吴敏俊</h2>
 
-<!-- ===== APP SECTION ===== -->
 <div id="appSection">
-<div class="mode-switch no-print">
-  <label>
-    <input type="radio" name="mode" value="selected" checked>
-    Tanlangan flashcardlar
-  </label>
 
-  <label>
-    <input type="radio" name="mode" value="random">
-    HSK bo‘yicha random
-  </label>
-</div>
+  <!-- MODE SWITCH -->
+  <div class="mode-switch no-print">
+    <label>
+      <input type="radio" name="mode" value="selected" checked>
+      Tanlangan flashcardlar
+    </label>
+
+    <label>
+      <input type="radio" name="mode" value="random">
+      HSK bo‘yicha random
+    </label>
+  </div>
+
   <!-- SEARCH -->
   <div class="no-print search-box">
     <input 
       type="text" 
       id="searchInput" 
-      placeholder="Hanzi yoki pinyin yozing..." 
+      placeholder="Hanzi yoki pinyin yozing..."
       autocomplete="off"
     />
   </div>
 
   <div id="searchResult"></div>
+
+  <!-- SELECTED COUNTER -->
+  <div class="no-print selected-info">
+    Tanlangan: <span id="selectedCount">0</span>
+  </div>
+
+  <!-- SELECTED LIST -->
+  <div id="selectedList" class="no-print"></div>
 
   <!-- CONTROLS -->
   <div class="controls no-print">
@@ -57,13 +68,15 @@
 
     <button onclick="generatePrint()">Random/Generate</button>
     <button onclick="window.print()">Print</button>
+    <button onclick="downloadPDF()">Download PDF</button>
   </div>
-<button onclick="downloadPDF()">Download PDF</button>
+
   <!-- PRINT AREA -->
   <div id="printArea"></div>
-<script src="font.js"></script>
+
 </div>
 
 <script src="app.js"></script>
+
 </body>
 </html>
