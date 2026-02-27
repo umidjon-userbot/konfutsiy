@@ -30,7 +30,32 @@ body { font-family:Arial; margin:0; }
   size: A4;
   margin: 0;
 }
+.search-wrapper{
+  position: relative;
+  width: 300px;
+}
 
+.live-results{
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: white;
+  border: 1px solid #ccc;
+  max-height: 250px;
+  overflow-y: auto;
+  z-index: 999;
+}
+
+.live-item{
+  padding: 8px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+.live-item:hover{
+  background: #f2f2f2;
+}
 @media print {
 
   html, body {
@@ -51,28 +76,7 @@ body { font-family:Arial; margin:0; }
   }
 
 }
-@media print {
-  .no-print { display:none; }
-}
-.result-card{
-  border:1px solid #ddd;
-  padding:14px;
-  margin:10px 0;
-  border-radius:12px;
-  cursor:pointer;
-  transition:0.2s;
-}
-.result-card:hover{
-  background:#f5f5f5;
-}
-.mode-switch{
-  margin:15px 0;
-  padding:10px;
-  border:1px solid #ddd;
-  border-radius:8px;
-  display:flex;
-  gap:20px;
-}
+
 @page {
   size: A4;
   margin: 0;
