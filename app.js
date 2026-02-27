@@ -165,12 +165,62 @@ function renderPages(){
     area.appendChild(back);
   }
 }
+// ===== GLOBAL DICTIONARY =====
+let hskDictionary = [];
 
+// ===== LOAD ALL HSK CSV =====
+async function loadAllHSK(){
+  hskDictionary = [];
+
+  for(let i=1;i<=6;i++){
+    try{
+      const r = await fetch("hsk"+i+".csv");
+      if(!r.ok) continue;
+
+      const text = await r.text();
+      const words = parseCSV(text);
+
+      words.forEach(w=>{
+        hskDictionary.push({
+          ...w,
+          level: "HSK"+i
+        });
+      });
+
+    }catch(e){}
+  }
+}
+
+// ===== SEARCH =====
+function searchWord(){
+  const value = document.getElementById("searchInput").value.trim();
+  const resultBox = document.getElementById("searchResult");
+
+  if(!value){
+    resultBox.innerHTML = "Iltimos so‘z kiriting";
+    return;
+  }
+
+  const found = hskDictionary.find(w => w.hanzi === value);
+
+  if(found){
+    resultBox.innerHTML = `
+      <div style="border:1px solid #000;padding:15px;">
+        <h2>${found.hanzi}</h2>
+        <p><strong>Pinyin:</strong> ${found.pinyin}</p>
+        <p><strong>Ma'nosi:</strong> ${found.uzbek || found.english || ""}</p>
+        <p><strong>Daraja:</strong> ${found.level}</p>
+      </div>
+    `;
+  } else {
+    resultBox.innerHTML = "Topilmadi (HSK1–6 ichida yo‘q)";
+  }
+}
 // ================= INIT =================
 document.addEventListener("DOMContentLoaded",()=>{
 
   const session = getSession();
-
+loadAllHSK();
   if(session){
     showApp();
     initApp();
