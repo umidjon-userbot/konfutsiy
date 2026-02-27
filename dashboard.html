@@ -2,17 +2,19 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcard Dashboard</title>
 <style>
-body { font-family:Arial; margin:0; }
-.header {
+body{margin:0;font-family:Arial;}
+.header{
   background:#111;
   color:white;
   padding:10px 20px;
   display:flex;
   justify-content:space-between;
+  align-items:center;
 }
-button {
+button{
   padding:6px 10px;
   border:none;
   background:#2563eb;
@@ -20,11 +22,8 @@ button {
   border-radius:5px;
   cursor:pointer;
 }
-#generateBtn:disabled {
-  background:gray;
-  cursor:not-allowed;
-}
-.section {
+button:hover{opacity:.9;}
+.main{
   padding:20px;
 }
 </style>
@@ -32,13 +31,13 @@ button {
 <body>
 
 <div class="header">
-  <span id="userInfo"></span>
+  <span id="userInfo">Yuklanmoqda...</span>
   <button onclick="logout()">Logout</button>
 </div>
 
-<div class="section" id="mainSection">
+<div class="main">
   <h2>Asosiy Flashcard Menu 🚀</h2>
-  <button id="generateBtn">Generate</button>
+  <p>Endi siz login qilgansiz.</p>
 </div>
 
 <script type="module">
@@ -46,7 +45,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "SIZNING_API_KEY",
+  apiKey: "AIzaSyBT1H17hj0xNHQScoBmJkdiuAlzy0qk1uY",
   authDomain: "wuminjun-f4d97.firebaseapp.com",
   projectId: "wuminjun-f4d97",
 };
@@ -54,32 +53,19 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-const generateBtn = document.getElementById("generateBtn");
-
 onAuthStateChanged(auth, (user) => {
-  if (user) {
-    document.getElementById("userInfo").innerText = "👤 " + user.displayName;
-    generateBtn.disabled = false;
-
-    // ✅ Avtomatik scroll
-    document.getElementById("mainSection").scrollIntoView({
-      behavior: "smooth"
-    });
-
+  if (!user) {
+    window.location.replace("index.html");
   } else {
-    window.location.href = "index.html";
+    document.getElementById("userInfo").innerText = "👤 " + user.displayName;
   }
 });
 
-window.logout = function() {
+window.logout = () => {
   signOut(auth).then(() => {
-    localStorage.removeItem("flashUser");
-    window.location.href = "index.html";
+    window.location.replace("index.html");
   });
 };
-
-// 4️⃣ Login bo'lmasa Generate bosilmaydi
-generateBtn.disabled = true;
 </script>
 
 </body>
