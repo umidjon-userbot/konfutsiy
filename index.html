@@ -1,20 +1,35 @@
-
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GitHub Static Telegram Tracker</title>
+<title>Telegram Unified Login (Static)</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 body{font-family:Arial;background:#fff;color:#000;padding:20px}
-.card{border:1px solid #000;padding:10px;margin:5px}
+button{padding:8px 12px;margin-top:10px}
+hr{margin:30px 0}
 </style>
 </head>
 <body>
 
-<h2>Telegram Login Tracker (Static)</h2>
-<div id="status">Waiting for Telegram...</div>
+<h2>Telegram Unified Login System</h2>
+
+<div id="status">Waiting for login...</div>
+
+<button onclick="clearSession();location.reload();">Logout</button>
+
+<hr>
+
+<h3>Telegram Login (Browser OAuth)</h3>
+
+<script async 
+  src="https://telegram.org/js/telegram-widget.js?22"
+  data-telegram-login="hskFlash_cardsbot"
+  data-size="large"
+  data-onauth="onTelegramAuth(user)"
+  data-request-access="write">
+</script>
 
 <script src="app.js"></script>
 </body>

