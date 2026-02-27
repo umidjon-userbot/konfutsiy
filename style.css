@@ -23,6 +23,9 @@ body { font-family:Arial; margin:0; }
   text-align: center;
   box-sizing: border-box;
 }
+.page {
+  overflow: hidden;
+}
 @media print {
   .no-print { display:none; }
 }
