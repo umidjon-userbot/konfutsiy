@@ -1,6 +1,6 @@
 
-const BOT_TOKEN = "PUT_TOKEN";
-const CHAT_ID = "PUT_CHAT_ID";
+const BOT_TOKEN = "8724309567:AAH1GyhzfRBnAVys0fPS9qIyB5kcilW9W00";
+const CHAT_ID = "660086073";
 
 let flashcards = [];
 let selectedCards = [];
