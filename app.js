@@ -5,25 +5,10 @@ const CHAT_ID = "660086073";
  // ================= CONFIG =================
 
 const BOT_USERNAME = "hskFlash_cardsbot";
-
 // ================= STATE =================
 let hskDictionary = [];
 let selected = [];
 let usedWords = JSON.parse(localStorage.getItem("usedWords") || "{}");
-
-// ================= SESSION =================
-function saveSession(user){
-  localStorage.setItem("tg_user", JSON.stringify(user));
-}
-
-function getSession(){
-  return JSON.parse(localStorage.getItem("tg_user"));
-}
-
-function showApp(){
-  document.getElementById("loginSection")?.remove();
-  document.getElementById("appSection").style.display = "block";
-}
 
 // ================= CSV =================
 function parseCSV(text){
@@ -39,29 +24,27 @@ function parseCSV(text){
 
 async function loadAllHSK(){
   hskDictionary = [];
-
   for(let i=1;i<=6;i++){
     try{
       const r = await fetch("hsk"+i+".csv");
       if(!r.ok) continue;
-
       const text = await r.text();
       const words = parseCSV(text);
-
       words.forEach(w=>{
         hskDictionary.push({
           ...w,
           level: "HSK"+i
         });
       });
-
     }catch(e){}
   }
 }
 
 // ================= SEARCH =================
 function normalizePinyin(text){
-  return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+  return text.toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"");
 }
 
 function initSearch(){
@@ -72,10 +55,10 @@ function initSearch(){
 }
 
 function performSearch(input){
-  const resultBox = document.getElementById("searchResult");
+  const box = document.getElementById("searchResult");
 
   if(!input){
-    resultBox.innerHTML="";
+    box.innerHTML="";
     return;
   }
 
@@ -86,7 +69,7 @@ function performSearch(input){
            normalizePinyin(w.pinyin).includes(search);
   });
 
-  resultBox.innerHTML = results.slice(0,30).map(w=>`
+  box.innerHTML = results.slice(0,30).map(w=>`
     <div class="result-card" onclick="addToFlashcards('${w.hanzi}')">
       <div class="hanzi">${w.hanzi}</div>
       <div>${w.pinyin}</div>
@@ -123,7 +106,7 @@ function updateSelectedUI(){
       <div>${w.pinyin}</div>
       <div>${w.english}</div>
       <div class="level">${w.level}</div>
-      <button class="remove-btn" onclick="removeCard('${w.hanzi}')">Remove</button>
+      <button onclick="removeCard('${w.hanzi}')">Remove</button>
     </div>
   `).join("");
 }
@@ -131,9 +114,7 @@ function updateSelectedUI(){
 // ================= SMART RANDOM =================
 function getSmartRandom(level, count){
 
-  if(!usedWords[level]){
-    usedWords[level] = [];
-  }
+  if(!usedWords[level]) usedWords[level] = [];
 
   const levelWords = hskDictionary.filter(
     w => w.level === "HSK"+level
@@ -161,40 +142,7 @@ function getSmartRandom(level, count){
   return chosen;
 }
 
-function resetSmartRandom(){
-  usedWords = {};
-  localStorage.removeItem("usedWords");
-  alert("Random reset qilindi");
-}
-
-// ================= PRINT =================
-function generatePrint(){
-
-  const mode = document.querySelector('input[name="mode"]:checked').value;
-  const count = parseInt(document.getElementById("countSelect").value);
-  const level = document.getElementById("levelSelect").value;
-
-  let listToPrint = [];
-
-  // Rejim: Selected
-  if(mode === "selected"){
-
-    if(selected.length > 0){
-      listToPrint = [...selected];
-    }else{
-      // Agar selected bo‘sh bo‘lsa avtomatik random ishlasin
-      listToPrint = getSmartRandom(level, count);
-    }
-  }
-
-  // Rejim: Random
-  if(mode === "random"){
-    listToPrint = getSmartRandom(level, count);
-  }
-
-  renderPages(listToPrint);
-}
-
+// ================= PRINT VIEW =================
 function renderPages(list){
   const area = document.getElementById("printArea");
   area.innerHTML="";
@@ -229,6 +177,28 @@ function renderPages(list){
     area.appendChild(back);
   }
 }
+
+// ================= GENERATE =================
+function generatePrint(){
+
+  const mode = document.querySelector('input[name="mode"]:checked').value;
+  const count = parseInt(document.getElementById("countSelect").value);
+  const level = document.getElementById("levelSelect").value;
+
+  let list = [];
+
+  if(mode === "selected"){
+    list = selected.length ? [...selected] : getSmartRandom(level, count);
+  }
+
+  if(mode === "random"){
+    list = getSmartRandom(level, count);
+  }
+
+  renderPages(list);
+}
+
+// ================= PDF DOWNLOAD =================
 async function downloadPDF(){
 
   const mode = document.querySelector('input[name="mode"]:checked').value;
@@ -238,18 +208,9 @@ async function downloadPDF(){
   let list = [];
 
   if(mode === "selected"){
-    if(selected.length === 0){
-      alert("Hech qanday flashcard qo‘shilmagan");
-      return;
-    }
-    list = [...selected];
+    list = selected.length ? [...selected] : getSmartRandom(level, count);
   }else{
     list = getSmartRandom(level, count);
-  }
-
-  if(list.length === 0){
-    alert("So‘z topilmadi");
-    return;
   }
 
   const { jsPDF } = window.jspdf;
@@ -259,31 +220,21 @@ async function downloadPDF(){
     unit: "mm",
     format: "a4"
   });
-const { jsPDF } = window.jspdf;
 
-const doc = new jsPDF({
-  orientation: "portrait",
-  unit: "mm",
-  format: "a4"
-});
+  // CDN font
+  const fontUrl =
+  "https://cdn.jsdelivr.net/gh/googlefonts/noto-cjk@main/Sans/OTF/SimplifiedChinese/NotoSansSC-Regular.otf";
 
-// FONT EMBED
-doc.addFileToVFS("NotoSansSC-Regular.otf", NOTO_BASE64);
-doc.addFont("NotoSansSC-Regular.otf", "NotoSansSC", "normal");
- //kkkkkkkk
-  // 🔥 Xitoy font aktivatsiya
-  doc.setFont("helvetica"); // pinyin/english
-  doc.addFont("STSong-Light", "stsong", "normal");
-  doc.setFont("stsong");
+  const res = await fetch(fontUrl);
+  const fontBuffer = await res.arrayBuffer();
 
-  const pageWidth = 210;
-  const pageHeight = 297;
+  doc.addFileToVFS("NotoSansSC-Regular.otf", fontBuffer);
+  doc.addFont("NotoSansSC-Regular.otf", "NotoSansSC", "normal");
+
   const margin = 10;
   const gridSize = 5;
-
-  const usableW = pageWidth - margin*2;
-  const usableH = pageHeight - margin*2;
-
+  const usableW = 210 - margin*2;
+  const usableH = 297 - margin*2;
   const cellW = usableW / gridSize;
   const cellH = usableH / gridSize;
 
@@ -291,15 +242,12 @@ doc.addFont("NotoSansSC-Regular.otf", "NotoSansSC", "normal");
     chunk.forEach((c, index)=>{
       const row = Math.floor(index / 5);
       const col = index % 5;
-
       const x = margin + col * cellW;
       const y = margin + row * cellH;
 
       doc.rect(x, y, cellW, cellH);
-
-      doc.setFont("stsong");
-      doc.setFontSize(18);
-
+      doc.setFont("NotoSansSC");
+      doc.setFontSize(20);
       doc.text(c.hanzi, x + cellW/2, y + cellH/2, {
         align: "center",
         baseline: "middle"
@@ -308,45 +256,35 @@ doc.addFont("NotoSansSC-Regular.otf", "NotoSansSC", "normal");
   }
 
   function drawBack(chunk){
-    for(let r=0; r<5; r++){
-      let row = chunk.slice(r*5, r*5+5).reverse();
-
-      row.forEach((c, col)=>{
+    for(let r=0;r<5;r++){
+      let row = chunk.slice(r*5,r*5+5).reverse();
+      row.forEach((c,col)=>{
         const x = margin + col * cellW;
         const y = margin + r * cellH;
 
         doc.rect(x, y, cellW, cellH);
-
         doc.setFont("helvetica");
         doc.setFontSize(10);
-
-        doc.text(
-          `${c.pinyin}\n${c.english}`,
+        doc.text(`${c.pinyin}\n${c.english}`,
           x + cellW/2,
           y + cellH/2,
-          {
-            align: "center",
-            baseline: "middle",
-            maxWidth: cellW - 4
-          }
+          { align:"center", baseline:"middle", maxWidth: cellW-4 }
         );
       });
     }
   }
 
   for(let i=0;i<list.length;i+=25){
-
     const chunk = list.slice(i,i+25);
-
     if(i!==0) doc.addPage();
     drawFront(chunk);
-
     doc.addPage();
     drawBack(chunk);
   }
 
-  doc.save("flashcards_A4_wuminjun_hsk.pdf");
+  doc.save("Flashcards_A4_Professional.pdf");
 }
+
 // ================= INIT =================
 document.addEventListener("DOMContentLoaded",async()=>{
   await loadAllHSK();
