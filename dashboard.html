@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="uz">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Flashcard Dashboard</title>
+
 <style>
-body{margin:0;font-family:Arial;}
+body{margin:0;font-family:Arial;background:#f3f4f6;}
 .header{
   background:#111;
   color:white;
@@ -15,17 +16,15 @@ body{margin:0;font-family:Arial;}
   align-items:center;
 }
 button{
-  padding:6px 10px;
+  padding:6px 12px;
   border:none;
   background:#2563eb;
   color:white;
-  border-radius:5px;
+  border-radius:6px;
   cursor:pointer;
 }
 button:hover{opacity:.9;}
-.main{
-  padding:20px;
-}
+.main{padding:30px;}
 </style>
 </head>
 <body>
@@ -37,55 +36,25 @@ button:hover{opacity:.9;}
 
 <div class="main">
   <h2>Asosiy Flashcard Menu 🚀</h2>
-  <button onclick="openApp()">Flashcardni ochish</button>
   <p>Endi siz login qilgansiz.</p>
+  <button onclick="openApp()">Flashcardni ochish</button>
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-window.openApp = () => {
-  window.location.href = "index-2.html";
-};
-const firebaseConfig = {
-  apiKey: "AIzaSyBT1H17hj0xNHQScoBmJkdiuAlzy0qk1uY",
-  authDomain: "wuminjun-f4d97.firebaseapp.com",
-  projectId: "wuminjun-f4d97",
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-
-  
-<script type="module">
 import { requireAuth, logout, setUserInfo } from "./auth.js";
 
+// Login bo'lmasa index ga qaytadi
 requireAuth("index.html");
+
+// User ismini chiqaradi
 setUserInfo("userInfo");
 
+// Logout global qilish
 window.logout = logout;
 
+// index-2 ni ochish
 window.openApp = () => {
   window.location.href = "index-2.html";
-};
-</script>
-
-
-onAuthStateChanged(auth, (user) => {
-  if (!user) {
-    window.location.replace("index.html");
-  } else {
-    document.getElementById("userInfo").innerText = "👤 " + user.displayName;
-  }
-});
-
-
-
-  
-window.logout = () => {
-  signOut(auth).then(() => {
-    window.location.replace("index.html");
-  });
 };
 </script>
 
