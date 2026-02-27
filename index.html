@@ -5,56 +5,55 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Flashcard</title>
 
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <h2 class="no-print">Flashcard 吴敏俊</h2>
 
-<div id="loginSection" class="no-print">
-  <div id="widgetContainer"></div>
+<!-- ===== APP SECTION ===== -->
+<div id="appSection">
+
+  <!-- SEARCH -->
+  <div class="no-print search-box">
+    <input 
+      type="text" 
+      id="searchInput" 
+      placeholder="Hanzi yoki pinyin yozing..." 
+      autocomplete="off"
+    />
+  </div>
+
+  <div id="searchResult"></div>
+
+  <!-- CONTROLS -->
+  <div class="controls no-print">
+    <select id="levelSelect">
+      <option value="1">HSK1</option>
+      <option value="2">HSK2</option>
+      <option value="3">HSK3</option>
+      <option value="4">HSK4</option>
+      <option value="5">HSK5</option>
+      <option value="6">HSK6</option>
+    </select>
+
+    <select id="countSelect">
+      <option value="25">25</option>
+      <option value="50">50</option>
+      <option value="75">75</option>
+      <option value="100">100</option>
+    </select>
+
+    <button onclick="generatePrint()">Generate Print</button>
+    <button onclick="window.print()">Print</button>
+  </div>
+
+  <!-- PRINT AREA -->
+  <div id="printArea"></div>
+
 </div>
-<div id="loginSection" class="no-print">
-  <div id="widgetContainer"></div>
-</div>
-<div id="appSection" style="display:none;">
-<div id="printArea"></div>
 
-
-<div class="no-print" style="margin:20px 0;">
-  <input 
-    type="text" 
-    id="searchInput" 
-    placeholder="Hanzi yoki pinyin yozing..." 
-    autocomplete="off"
-  />
-</div>
-
-<div id="searchResult"></div>
-
-<div id="searchResult"></div>
-
-<div class="controls no-print">
-<select id="levelSelect"></select>
-
-<select id="countSelect">
-<option value="25">25</option>
-<option value="50">50</option>
-<option value="75">75</option>
-<option value="100">100</option>
-</select>
-
-
-<button onclick="generatePrint()">Generate Print</button>
-
-<button onclick="window.print()">Print</button>
-</div>
-
-
-<div id="searchResult" style="margin-bottom:20px;"></div>
 <script src="app.js"></script>
 </body>
 </html>
