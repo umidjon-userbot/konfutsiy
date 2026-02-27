@@ -76,7 +76,28 @@ body { font-family:Arial; margin:0; }
   }
 
 }
-
+@media print {
+  .no-print { display:none; }
+}
+.result-card{
+  border:1px solid #ddd;
+  padding:14px;
+  margin:10px 0;
+  border-radius:12px;
+  cursor:pointer;
+  transition:0.2s;
+}
+.result-card:hover{
+  background:#f5f5f5;
+}
+.mode-switch{
+  margin:15px 0;
+  padding:10px;
+  border:1px solid #ddd;
+  border-radius:8px;
+  display:flex;
+  gap:20px;
+}
 @page {
   size: A4;
   margin: 0;
