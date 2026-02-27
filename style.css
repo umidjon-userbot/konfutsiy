@@ -250,10 +250,10 @@ body {
   }
 
   .card.back {
-    font-size: 14px;
+    font-size: 20px;
   }
 
   .card.back .pinyin {
-    font-size: 16px;
+    font-size: 20px;
   }
 }
