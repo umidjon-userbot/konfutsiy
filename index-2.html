@@ -6,7 +6,7 @@
 <title>Flashcard</title>
 <link rel="stylesheet" href="style.css">
 <link rel="icon" href="favicon.ico">
-/////////////////
+
 <style>
 body{
   margin:0;
@@ -51,7 +51,7 @@ button:hover{
 </head>
 <body>
 
-<div class="header">
+<div class="header no-print">
   <span id="userInfo">Yuklanmoqda...</span>
   <div>
     <button onclick="goBack()">Dashboard</button>
@@ -83,7 +83,7 @@ window.goBack = () => {
   window.location.href = "dashboard.html";
 };
 </script>
-  ///////////
+  
 <style>
 @media print {
   .no-print { display: none !important; }
