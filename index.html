@@ -3,45 +3,31 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Flashcard Master App</title>
+<title>Flashcard Production</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h2 class="no-print">Flashcard Master (Telegram + CSV + Ultra Print)</h2>
+<h2 class="no-print">Flashcard Production Build</h2>
 
-<div id="loginSection">
-  <div id="widgetContainer"></div>
+<div class="controls no-print">
+  <select id="levelSelect"></select>
+  <select id="countSelect">
+    <option value="25">25</option>
+    <option value="50">50</option>
+    <option value="100">100</option>
+  </select>
+  <button onclick="shuffleLevel()">Shuffle</button>
+  <button onclick="downloadPDF()">Download PDF</button>
+  <button onclick="printCards()">Print</button>
 </div>
 
-<div id="appSection" style="display:none;">
+<div id="card" class="card no-print" onclick="flipCard()"></div>
+<button class="no-print" onclick="nextCard()">Next</button>
 
-  <div class="controls no-print">
-    <select id="levelSelect">
-      <option value="1">HSK1</option>
-      <option value="2">HSK2</option>
-      <option value="3">HSK3</option>
-      <option value="4">HSK4</option>
-      <option value="5">HSK5</option>
-      <option value="6">HSK6</option>
-    </select>
-
-    <select id="countSelect">
-      <option value="25">25</option>
-      <option value="50">50</option>
-      <option value="100">100</option>
-    </select>
-
-    <button onclick="shuffleLevel()">Shuffle</button>
-    <button onclick="printCards()">Print</button>
-  </div>
-
-  <div class="card no-print" id="card" onclick="flipCard()"></div>
-  <button class="no-print" onclick="nextCard()">Next</button>
-
-  <div id="printArea"></div>
-</div>
+<div id="printArea"></div>
 
 <script src="app.js"></script>
 </body>
