@@ -25,3 +25,22 @@ body { font-family:Arial; margin:0; }
 @media print {
   .no-print { display:none; }
 }
+.result-card{
+  border:1px solid #ddd;
+  padding:14px;
+  margin:10px 0;
+  border-radius:12px;
+  cursor:pointer;
+  transition:0.2s;
+}
+.result-card:hover{
+  background:#f5f5f5;
+}
+.hanzi{
+  font-size:26px;
+  font-weight:bold;
+}
+.level{
+  font-size:12px;
+  color:gray;
+}
