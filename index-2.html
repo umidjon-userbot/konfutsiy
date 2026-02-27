@@ -6,6 +6,84 @@
 <title>Flashcard</title>
 <link rel="stylesheet" href="style.css">
 <link rel="icon" href="favicon.ico">
+/////////////////
+<style>
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#f3f4f6;
+}
+
+.header{
+  background:#111;
+  color:white;
+  padding:10px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+button{
+  padding:6px 12px;
+  border:none;
+  background:#2563eb;
+  color:white;
+  border-radius:6px;
+  cursor:pointer;
+  margin-left:8px;
+}
+
+button:hover{
+  opacity:.9;
+}
+
+.main{
+  padding:30px;
+}
+
+.card{
+  background:white;
+  padding:20px;
+  border-radius:10px;
+  box-shadow:0 5px 15px rgba(0,0,0,.1);
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <span id="userInfo">Yuklanmoqda...</span>
+  <div>
+    <button onclick="goBack()">Dashboard</button>
+    <button onclick="logout()">Logout</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="card">
+    <h2>Flashcard Asosiy Sahifa 🚀</h2>
+    <p>Bu index-2.html — asosiy flashcard ishlaydigan joy.</p>
+  </div>
+</div>
+
+<script type="module">
+import { requireAuth, logout, setUserInfo } from "./auth.js";
+
+// Login bo‘lmasa index.html ga qaytaradi
+requireAuth("index.html");
+
+// User ismini chiqaradi
+setUserInfo("userInfo");
+
+// Logout funksiyasi
+window.logout = logout;
+
+// Dashboardga qaytish
+window.goBack = () => {
+  window.location.href = "dashboard.html";
+};
+</script>
+  ///////////
 <style>
 @media print {
   .no-print { display: none !important; }
