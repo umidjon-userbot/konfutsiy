@@ -2,9 +2,6 @@
 const BOT_TOKEN = "8724309567:AAH1GyhzfRBnAVys0fPS9qIyB5kcilW9W00";
 const CHAT_ID = "660086073";
 const BOT_USERNAME = "hskFlash_cardsbot";
-
-const BOT_USERNAME = "hskFlash_cardsbot";
-
 // ================= STATE =================
 let hskDictionary = [];
 let selected = [];
