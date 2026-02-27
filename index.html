@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Login - Flashcard</title>
+<style>
+body {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  font-family:Arial;
+  background:#111;
+  color:white;
+}
+.login-box {
+  text-align:center;
+}
+button {
+  padding:10px 20px;
+  margin-top:15px;
+  border:none;
+  background:#2563eb;
+  color:white;
+  border-radius:6px;
+  cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<div class="login-box">
+  <h2>Flashcard tizimi</h2>
+  <p id="status">Login qilinmagan</p>
+  <button onclick="login()">Google Login</button>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "SIZNING_API_KEY",
+  authDomain: "wuminjun-f4d97.firebaseapp.com",
+  projectId: "wuminjun-f4d97",
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+window.login = function() {
+  signInWithPopup(auth, provider);
+};
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    localStorage.setItem("flashUser", user.uid);
+    window.location.href = "dashboard.html";
+  }
+});
+</script>
+
+</body>
+</html>
