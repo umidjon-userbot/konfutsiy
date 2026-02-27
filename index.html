@@ -21,6 +21,14 @@
   <div id="widgetContainer"></div>
 </div>
 <div id="appSection" style="display:none;">
+<div id="printArea"></div>
+
+
+</div>
+<div class="no-print" style="margin:20px 0;">
+  <input type="text" id="searchInput" placeholder="Hanzi yozing..." />
+  <button onclick="searchWord()">Search</button>
+</div>
 
 <div class="controls no-print">
 <select id="levelSelect"></select>
@@ -37,14 +45,6 @@
 <button onclick="window.print()">Print</button>
 </div>
 
-<div id="printArea"></div>
-
-
-</div>
-<div class="no-print" style="margin:20px 0;">
-  <input type="text" id="searchInput" placeholder="Hanzi yozing..." />
-  <button onclick="searchWord()">Search</button>
-</div>
 
 <div id="searchResult" style="margin-bottom:20px;"></div>
 <script src="app.js"></script>
