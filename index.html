@@ -2,36 +2,39 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Login - Flashcard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcard Login</title>
 <style>
-body {
+body{
+  margin:0;
+  height:100vh;
   display:flex;
   justify-content:center;
   align-items:center;
-  height:100vh;
-  font-family:Arial;
   background:#111;
+  font-family:Arial;
   color:white;
 }
-.login-box {
+.box{
   text-align:center;
 }
-button {
+button{
   padding:10px 20px;
-  margin-top:15px;
   border:none;
   background:#2563eb;
   color:white;
   border-radius:6px;
   cursor:pointer;
+  margin-top:15px;
 }
+button:hover{opacity:.9;}
 </style>
 </head>
 <body>
 
-<div class="login-box">
+<div class="box">
   <h2>Flashcard tizimi</h2>
-  <p id="status">Login qilinmagan</p>
+  <p id="status">Tekshirilmoqda...</p>
   <button onclick="login()">Google Login</button>
 </div>
 
@@ -49,14 +52,15 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
-window.login = function() {
+window.login = () => {
   signInWithPopup(auth, provider);
 };
 
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    localStorage.setItem("flashUser", user.uid);
-    window.location.href = "dashboard.html";
+    window.location.replace("dashboard.html");
+  } else {
+    document.getElementById("status").innerText = "Login qilinmagan";
   }
 });
 </script>
