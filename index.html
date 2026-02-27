@@ -4,33 +4,27 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Flashcard</title>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link rel="stylesheet" href="style.css">
-</head>
 <link rel="icon" href="favicon.ico">
+</head>
 <body>
-
 <div class="header-bar no-print">
   <h2>Flashcard 吴敏俊</h2>
-  <div id="liveClock" class="led-clock"></div>
+  <div id="ledClock" class="led-clock"></div>
 </div>
-
 <div id="appSection">
-
   <!-- MODE SWITCH -->
   <div class="mode-switch no-print">
     <label>
       <input type="radio" name="mode" value="selected" checked>
       Tanlangan flashcardlar
     </label>
-
     <label>
       <input type="radio" name="mode" value="random">
-      HSK bo‘yicha random
+      HSK bo'yicha random
     </label>
   </div>
-
   <!-- SEARCH -->
   <div class="no-print search-box">
     <input 
@@ -40,17 +34,13 @@
       autocomplete="off"
     />
   </div>
-
-  <div id="searchResult"></div>
-
+  <div id="liveResults"></div>
   <!-- SELECTED COUNTER -->
   <div class="no-print selected-info">
     Tanlangan: <span id="selectedCount">0</span>
   </div>
-
   <!-- SELECTED LIST -->
   <div id="selectedList" class="no-print"></div>
-
   <!-- CONTROLS -->
   <div class="controls no-print">
     <select id="levelSelect">
@@ -61,25 +51,19 @@
       <option value="5">HSK5</option>
       <option value="6">HSK6</option>
     </select>
-
     <select id="countSelect">
       <option value="25">25</option>
       <option value="50">50</option>
       <option value="75">75</option>
       <option value="100">100</option>
     </select>
-
     <button onclick="generatePrint()">Random/Generate</button>
     <button onclick="window.print()">Print</button>
     <button onclick="downloadPDF()">Download PDF</button>
   </div>
-
   <!-- PRINT AREA -->
   <div id="printArea"></div>
-
 </div>
-
 <script src="app.js"></script>
-
 </body>
 </html>
