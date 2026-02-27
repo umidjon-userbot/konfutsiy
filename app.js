@@ -201,9 +201,9 @@ function generatePrint(){
 // ================= PDF DOWNLOAD =================
 async function downloadPDF(){
 
-  const mode = document.querySelector('input[name="mode"]:checked').value;
-  const count = parseInt(document.getElementById("countSelect").value);
-  const level = document.getElementById("levelSelect").value;
+  const mode = document.querySelector('input[name="mode"]:checked')?.value || "random";
+  const count = parseInt(document.getElementById("countSelect")?.value || 25);
+  const level = document.getElementById("levelSelect")?.value || 1;
 
   let list = [];
 
@@ -211,6 +211,11 @@ async function downloadPDF(){
     list = selected.length ? [...selected] : getSmartRandom(level, count);
   }else{
     list = getSmartRandom(level, count);
+  }
+
+  if(list.length === 0){
+    alert("So‘z topilmadi");
+    return;
   }
 
   const { jsPDF } = window.jspdf;
@@ -221,24 +226,18 @@ async function downloadPDF(){
     format: "a4"
   });
 
-  // CDN font
-  const fontUrl =
-  "https://cdn.jsdelivr.net/gh/googlefonts/noto-cjk@main/Sans/OTF/SimplifiedChinese/NotoSansSC-Regular.otf";
-
-  const res = await fetch(fontUrl);
-  const fontBuffer = await res.arrayBuffer();
-
-  doc.addFileToVFS("NotoSansSC-Regular.otf", fontBuffer);
-  doc.addFont("NotoSansSC-Regular.otf", "NotoSansSC", "normal");
-
   const margin = 10;
-  const gridSize = 5;
   const usableW = 210 - margin*2;
   const usableH = 297 - margin*2;
-  const cellW = usableW / gridSize;
-  const cellH = usableH / gridSize;
+  const cellW = usableW / 5;
+  const cellH = usableH / 5;
 
-  function drawFront(chunk){
+  for(let i=0;i<list.length;i+=25){
+
+    const chunk = list.slice(i,i+25);
+
+    if(i!==0) doc.addPage();
+
     chunk.forEach((c, index)=>{
       const row = Math.floor(index / 5);
       const col = index % 5;
@@ -246,45 +245,34 @@ async function downloadPDF(){
       const y = margin + row * cellH;
 
       doc.rect(x, y, cellW, cellH);
-      doc.setFont("NotoSansSC");
-      doc.setFontSize(20);
       doc.text(c.hanzi, x + cellW/2, y + cellH/2, {
-        align: "center",
-        baseline: "middle"
+        align:"center",
+        baseline:"middle"
       });
     });
-  }
 
-  function drawBack(chunk){
+    doc.addPage();
+
     for(let r=0;r<5;r++){
       let row = chunk.slice(r*5,r*5+5).reverse();
+
       row.forEach((c,col)=>{
         const x = margin + col * cellW;
         const y = margin + r * cellH;
 
         doc.rect(x, y, cellW, cellH);
-        doc.setFont("helvetica");
-        doc.setFontSize(10);
-        doc.text(`${c.pinyin}\n${c.english}`,
+        doc.text(
+          `${c.pinyin}\n${c.english}`,
           x + cellW/2,
           y + cellH/2,
-          { align:"center", baseline:"middle", maxWidth: cellW-4 }
+          { align:"center", baseline:"middle", maxWidth:cellW-4 }
         );
       });
     }
   }
 
-  for(let i=0;i<list.length;i+=25){
-    const chunk = list.slice(i,i+25);
-    if(i!==0) doc.addPage();
-    drawFront(chunk);
-    doc.addPage();
-    drawBack(chunk);
-  }
-
-  doc.save("Flashcards_A4_Professional.pdf");
+  doc.save("flashcards_safe.pdf");
 }
-
 // ================= INIT =================
 document.addEventListener("DOMContentLoaded",async()=>{
   await loadAllHSK();
