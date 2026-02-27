@@ -3,24 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Telegram Unified Login</title>
+<title>HSK Flashcard Ultra Print</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<style>
-body{font-family:Arial;background:#fff;color:#000;padding:20px}
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h2>Flashcards App</h2>
+<h2 class="no-print">HSK Flashcards Ultra</h2>
 
-<div id="loginSection">
-  <div id="widgetContainer"></div>
+<div class="no-print controls">
+  <select id="levelSelect">
+    <option value="1">HSK1</option>
+    <option value="2">HSK2</option>
+    <option value="3">HSK3</option>
+    <option value="4">HSK4</option>
+    <option value="5">HSK5</option>
+    <option value="6">HSK6</option>
+  </select>
+
+  <select id="countSelect">
+    <option value="25">25</option>
+    <option value="50">50</option>
+    <option value="100">100</option>
+  </select>
+
+  <button onclick="shuffleLevel()">Shuffle</button>
+  <button onclick="printCards()">Print</button>
 </div>
 
-<div id="appSection" style="display:none;">
-  <h3>Asosiy qism</h3>
-  <p>Login muvaffaqiyatli.</p>
-</div>
+<div id="preview" class="no-print"></div>
+<div id="printArea"></div>
 
 <script src="app.js"></script>
 </body>
