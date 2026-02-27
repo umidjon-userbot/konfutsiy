@@ -101,9 +101,26 @@ async function autoDetect(){
 }
 
 async function loadLevel(lv){
-  const r=await fetch("./hsk"+lv+".csv");
-  const t=await r.text();
-  flashcards=parseCSV(t);
+  try{
+    const basePath = window.location.pathname
+      .split("/")
+      .slice(0, -1)
+      .join("/") + "/";
+
+    const url = window.location.origin + basePath + "hsk" + lv + ".csv";
+
+    console.log("Loading CSV from:", url);
+
+    const r = await fetch(url);
+    if(!r.ok) throw new Error("CSV not found");
+
+    const t = await r.text();
+    flashcards = parseCSV(t);
+
+  }catch(e){
+    console.error("CSV ERROR:", e);
+    alert("CSV yuklanmadi yoki xato.");
+  }
 }
 
 function shuffleArray(a){ return a.sort(()=>Math.random()-0.5); }
