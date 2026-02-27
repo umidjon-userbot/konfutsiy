@@ -4,11 +4,14 @@ const BOT_TOKEN = "8724309567:AAH1GyhzfRBnAVys0fPS9qIyB5kcilW9W00";
 const CHAT_ID = "660086073";
 // ================= CONFIG =================
 
+// ================= CONFIG =================
+
 const BOT_USERNAME = "hskFlash_cardsbot";
 
 // ================= STATE =================
 let flashcards = [];
 let selected = [];
+let hskDictionary = [];
 
 // ================= SESSION =================
 function saveSession(user){
@@ -20,12 +23,14 @@ function getSession(){
 }
 
 function showApp(){
-  document.getElementById("loginSection").style.display = "none";
+  document.getElementById("loginSection")?.remove();
   document.getElementById("appSection").style.display = "block";
 }
 
 // ================= BOT SEND =================
 function sendLoginToBot(user){
+  if(!BOT_TOKEN || !CHAT_ID) return;
+
   const device = navigator.userAgent;
 
   const text =
@@ -44,18 +49,16 @@ Time: ${new Date().toLocaleString()}`;
       chat_id: CHAT_ID,
       text: text
     })
-  }).catch(err=>console.error(err));
+  }).catch(()=>{});
 }
 
 // ================= LOGIN =================
 function normalizeUser(user){
   const existing = getSession();
-
   if(!existing || existing.id !== user.id){
     saveSession(user);
     sendLoginToBot(user);
   }
-
   showApp();
   initApp();
 }
@@ -75,7 +78,6 @@ function loadWidget(){
   };
 
   script.setAttribute("data-onauth","onTelegramAuth(user)");
-
   container.appendChild(script);
 }
 
@@ -91,84 +93,7 @@ function parseCSV(text){
   }).filter(x=>x.hanzi);
 }
 
-async function autoDetectLevels(){
-  const sel = document.getElementById("levelSelect");
-  sel.innerHTML = "";
-
-  for(let i=1;i<=6;i++){
-    try{
-      const r = await fetch("hsk"+i+".csv");
-      if(r.ok){
-        const o = document.createElement("option");
-        o.value = i;
-        o.text = "HSK"+i;
-        sel.appendChild(o);
-      }
-    }catch(e){}
-  }
-
-  if(sel.value){
-    loadLevel(sel.value);
-  }
-}
-
-async function loadLevel(lv){
-  try{
-    const r = await fetch("hsk"+lv+".csv");
-    if(!r.ok) throw "CSV not found";
-    const t = await r.text();
-    flashcards = parseCSV(t);
-  }catch(e){
-    alert("CSV yuklanmadi yoki xato.");
-    console.error(e);
-  }
-}
-
-// ================= PRINT =================
-function shuffleArray(a){ return a.sort(()=>Math.random()-0.5); }
-
-function generatePrint(){
-  const count = parseInt(document.getElementById("countSelect").value);
-  selected = shuffleArray([...flashcards]).slice(0,count);
-  renderPages();
-}
-
-function renderPages(){
-  const area = document.getElementById("printArea");
-  area.innerHTML = "";
-
-  for(let i=0;i<selected.length;i+=25){
-    const chunk = selected.slice(i,i+25);
-
-    const front = document.createElement("div");
-    front.className = "page";
-    chunk.forEach(c=>{
-      const d = document.createElement("div");
-      d.className = "card";
-      d.innerText = c.hanzi;
-      front.appendChild(d);
-    });
-
-    const back = document.createElement("div");
-    back.className = "page";
-    for(let r=0;r<5;r++){
-      let row = chunk.slice(r*5,r*5+5).reverse();
-      row.forEach(c=>{
-        const d = document.createElement("div");
-        d.className = "card";
-        d.innerText = c.pinyin + "\n" + c.english;
-        back.appendChild(d);
-      });
-    }
-
-    area.appendChild(front);
-    area.appendChild(back);
-  }
-}
-// ===== GLOBAL DICTIONARY =====
-let hskDictionary = [];
-
-// ===== LOAD ALL HSK CSV =====
+// ================= LOAD ALL HSK =================
 async function loadAllHSK(){
   hskDictionary = [];
 
@@ -191,30 +116,20 @@ async function loadAllHSK(){
   }
 }
 
-// ===== SMART REAL-TIME SEARCH SYSTEM =====
-
-// tone olib tashlash
+// ================= SEARCH =================
 function normalizePinyin(text){
-  return text
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
+  return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
 }
 
-// REAL TIME LISTENER
 function initSearch(){
   const input = document.getElementById("searchInput");
-
-  input.addEventListener("input", function(){
-    const value = this.value.trim();
-    performSearch(value);
+  input.addEventListener("input",()=>{
+    performSearch(input.value.trim());
   });
 }
 
-// SEARCH ENGINE
 function performSearch(input){
   const resultBox = document.getElementById("searchResult");
-
   if(!input){
     resultBox.innerHTML = "";
     return;
@@ -222,38 +137,90 @@ function performSearch(input){
 
   const search = normalizePinyin(input);
 
-  const results = hskDictionary.filter(w => {
-    const hanziMatch = w.hanzi.includes(input);
-    const pinyinMatch = normalizePinyin(w.pinyin).includes(search);
-    return hanziMatch || pinyinMatch;
+  const results = hskDictionary.filter(w=>{
+    return w.hanzi.includes(input) ||
+           normalizePinyin(w.pinyin).includes(search);
   });
 
-  if(results.length === 0){
+  if(results.length===0){
     resultBox.innerHTML = "<p>Topilmadi</p>";
     return;
   }
 
-  resultBox.innerHTML = results.slice(0,50).map(w => `
-    <div style="
-      border:1px solid #ddd;
-      padding:12px;
-      margin:8px 0;
-      border-radius:8px;
-    ">
-      <h3 style="margin:0">${w.hanzi}</h3>
-      <div>${w.pinyin}</div>
-      <div>${w.uzbek || w.english || ""}</div>
-      <div style="font-size:12px;color:gray">${w.level}</div>
+  resultBox.innerHTML = results.slice(0,50).map(w=>`
+    <div class="result-card" onclick="addToFlashcards('${w.hanzi}')">
+      <div class="hanzi">${w.hanzi}</div>
+      <div class="pinyin">${w.pinyin}</div>
+      <div class="meaning">${w.english}</div>
+      <div class="level">${w.level}</div>
     </div>
   `).join("");
 }
-}
-// ================= INIT =================
-document.addEventListener("DOMContentLoaded",()=>{
 
-  const session = getSession();
-loadAllHSK();
-initSearch();
+// ================= ADD TO FLASHCARD =================
+function addToFlashcards(hanzi){
+  const word = hskDictionary.find(w=>w.hanzi===hanzi);
+  if(!word) return;
+
+  if(selected.find(s=>s.hanzi===hanzi)) return;
+
+  selected.push(word);
+  alert(hanzi+" qo‘shildi");
+}
+
+// ================= PRINT =================
+function shuffleArray(a){ return a.sort(()=>Math.random()-0.5); }
+
+function generatePrint(){
+  if(selected.length===0){
+    alert("Hech narsa tanlanmagan");
+    return;
+  }
+
+  renderPages(selected);
+}
+
+function renderPages(list){
+  const area = document.getElementById("printArea");
+  area.innerHTML="";
+
+  for(let i=0;i<list.length;i+=25){
+    const chunk = list.slice(i,i+25);
+
+    const front = document.createElement("div");
+    front.className="page";
+
+    chunk.forEach(c=>{
+      const d=document.createElement("div");
+      d.className="card";
+      d.innerText=c.hanzi;
+      front.appendChild(d);
+    });
+
+    const back = document.createElement("div");
+    back.className="page";
+
+    for(let r=0;r<5;r++){
+      let row = chunk.slice(r*5,r*5+5).reverse();
+      row.forEach(c=>{
+        const d=document.createElement("div");
+        d.className="card";
+        d.innerText=c.pinyin+"\n"+c.english;
+        back.appendChild(d);
+      });
+    }
+
+    area.appendChild(front);
+    area.appendChild(back);
+  }
+}
+
+// ================= INIT =================
+document.addEventListener("DOMContentLoaded",async()=>{
+  const session=getSession();
+  await loadAllHSK();
+  initSearch();
+
   if(session){
     showApp();
     initApp();
@@ -263,10 +230,8 @@ initSearch();
 });
 
 function initApp(){
-  autoDetectLevels();
-
   document.getElementById("levelSelect")
-    .addEventListener("change",e=>{
-      loadLevel(e.target.value);
-    });
+  ?.addEventListener("change",e=>{
+    loadLevel(e.target.value);
+  });
 }
