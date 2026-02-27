@@ -260,11 +260,16 @@ async function downloadPDF(){
     format: "a4"
   });
 
+  // 🔥 Xitoy font aktivatsiya
+  doc.setFont("helvetica"); // pinyin/english
+  doc.addFont("STSong-Light", "stsong", "normal");
+  doc.setFont("stsong");
+
   const pageWidth = 210;
   const pageHeight = 297;
-
-  const margin = 10;              // xavfsiz zona
+  const margin = 10;
   const gridSize = 5;
+
   const usableW = pageWidth - margin*2;
   const usableH = pageHeight - margin*2;
 
@@ -281,7 +286,9 @@ async function downloadPDF(){
 
       doc.rect(x, y, cellW, cellH);
 
-      doc.setFontSize(16);
+      doc.setFont("stsong");
+      doc.setFontSize(18);
+
       doc.text(c.hanzi, x + cellW/2, y + cellH/2, {
         align: "center",
         baseline: "middle"
@@ -292,13 +299,16 @@ async function downloadPDF(){
   function drawBack(chunk){
     for(let r=0; r<5; r++){
       let row = chunk.slice(r*5, r*5+5).reverse();
+
       row.forEach((c, col)=>{
         const x = margin + col * cellW;
         const y = margin + r * cellH;
 
         doc.rect(x, y, cellW, cellH);
 
+        doc.setFont("helvetica");
         doc.setFontSize(10);
+
         doc.text(
           `${c.pinyin}\n${c.english}`,
           x + cellW/2,
@@ -324,7 +334,7 @@ async function downloadPDF(){
     drawBack(chunk);
   }
 
-  doc.save("flashcards_A4_duplex.pdf");
+  doc.save("flashcards_A4_wuminjun_hsk.pdf");
 }
 // ================= INIT =================
 document.addEventListener("DOMContentLoaded",async()=>{
