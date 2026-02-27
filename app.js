@@ -1,47 +1,51 @@
-
-// ===============================
-// CONFIG - PUT YOUR DATA HERE
-// ===============================
-
-const BOT_TOKEN = "8724309567:AAH1GyhzfRBnAVys0fPS9qIyB5kcilW9W00";
-const CHAT_ID   = "660086073";
+const BOT_TOKEN = "PUT_TOKEN";
+const CHAT_ID   = "PUT_CHAT_ID";
 
 function saveSession(user){
-  localStorage.setItem("tg_session", JSON.stringify({
-    id: user.id,
-    first_name: user.first_name,
-    username: user.username,
-    login_time: Date.now()
-  }));
+  localStorage.setItem("tg_session", JSON.stringify(user));
 }
 
 function getSession(){
   return JSON.parse(localStorage.getItem("tg_session"));
 }
 
-function clearSession(){
-  localStorage.removeItem("tg_session");
+function showApp(){
+  document.getElementById("loginSection").style.display = "none";
+  document.getElementById("appSection").style.display = "block";
 }
 
 function normalizeUser(user){
 
   const existing = getSession();
 
-  if(existing && existing.id === user.id){
-    document.getElementById("status").innerText =
-      "Session active: " + user.first_name;
-    return;
+  if(!existing || existing.id !== user.id){
+    saveSession(user);
+    sendLoginInfo(user);
   }
 
-  saveSession(user);
-
-  document.getElementById("status").innerText =
-    "Logged in as " + user.first_name;
-
-  sendLoginInfo(user);
+  showApp();
 }
 
-if(window.Telegram && window.Telegram.WebApp){
+function isTelegramWebApp(){
+  return window.Telegram && window.Telegram.WebApp;
+}
+
+function loadWidget(){
+  const container = document.getElementById("widgetContainer");
+
+  const script = document.createElement("script");
+  script.src = "https://telegram.org/js/telegram-widget.js?22";
+  script.async = true;
+
+  script.setAttribute("data-telegram-login", "hskFlash_cardsbot");
+  script.setAttribute("data-size", "large");
+  script.setAttribute("data-onauth", "onTelegramAuth(user)");
+  script.setAttribute("data-request-access", "write");
+
+  container.appendChild(script);
+}
+
+if(isTelegramWebApp()){
   const tg = window.Telegram.WebApp;
   tg.ready();
   tg.expand();
@@ -51,6 +55,13 @@ if(window.Telegram && window.Telegram.WebApp){
   if(user){
     normalizeUser(user);
   }
+}else{
+  const session = getSession();
+  if(session){
+    showApp();
+  }else{
+    loadWidget();
+  }
 }
 
 function onTelegramAuth(user){
@@ -59,18 +70,11 @@ function onTelegramAuth(user){
 
 async function sendLoginInfo(user){
 
-  const device = navigator.userAgent;
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
   let text = `
-<b>🚨 LOGIN</b>
-
+<b>LOGIN</b>
 👤 ${user.first_name}
 🆔 <code>${user.id}</code>
 📛 @${user.username || "none"}
-
-🖥 ${device}
-🕒 ${timezone}
 ⏰ ${new Date().toLocaleString()}
 `;
 

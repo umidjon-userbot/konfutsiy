@@ -3,33 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Telegram Unified Login (Static)</title>
+<title>Telegram Unified Login</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 body{font-family:Arial;background:#fff;color:#000;padding:20px}
-button{padding:8px 12px;margin-top:10px}
-hr{margin:30px 0}
 </style>
 </head>
 <body>
 
-<h2>Telegram Unified Login System</h2>
+<h2>Flashcards App</h2>
 
-<div id="status">Waiting for login...</div>
+<div id="loginSection">
+  <div id="widgetContainer"></div>
+</div>
 
-<button onclick="clearSession();location.reload();">Logout</button>
-
-<hr>
-
-<h3>Telegram Login (Browser OAuth)</h3>
-
-<script async 
-  src="https://telegram.org/js/telegram-widget.js?22"
-  data-telegram-login="hskFlash_cardsbot"
-  data-size="large"
-  data-onauth="onTelegramAuth(user)"
-  data-request-access="write">
-</script>
+<div id="appSection" style="display:none;">
+  <h3>Asosiy qism</h3>
+  <p>Login muvaffaqiyatli.</p>
+</div>
 
 <script src="app.js"></script>
 </body>
