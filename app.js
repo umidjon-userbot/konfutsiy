@@ -3,6 +3,8 @@ const BOT_TOKEN = "8724309567:AAH1GyhzfRBnAVys0fPS9qIyB5kcilW9W00";
 const CHAT_ID = "660086073";
 const BOT_USERNAME = "hskFlash_cardsbot";
 
+const BOT_USERNAME = "hskFlash_cardsbot";
+
 // ================= STATE =================
 let hskDictionary = [];
 let selected = [];
@@ -213,7 +215,7 @@ function generatePrint() {
   renderPages(list);
 }
 
-// ================= PDF =================
+// ================= PDF WITH CANVAS =================
 function downloadPDF() {
   const mode = document.querySelector('input[name="mode"]:checked')?.value || "random";
   const count = parseInt(document.getElementById("countSelect")?.value || 25);
@@ -244,11 +246,18 @@ function downloadPDF() {
   const cellW = (210 - margin * 2) / 5;
   const cellH = (297 - margin * 2) / 5;
 
+  // Canvas yaratish
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  canvas.width = 300;
+  canvas.height = 300;
+
   for (let i = 0; i < list.length; i += 25) {
     const chunk = list.slice(i, i + 25);
 
     if (i !== 0) doc.addPage();
 
+    // ===== FRONT PAGE - Hanzi =====
     chunk.forEach((c, index) => {
       const row = Math.floor(index / 5);
       const col = index % 5;
@@ -257,14 +266,24 @@ function downloadPDF() {
       const y = margin + row * cellH;
 
       doc.rect(x, y, cellW, cellH);
-      doc.text(c.hanzi, x + cellW / 2, y + cellH / 2, {
-        align: "center",
-        baseline: "middle"
-      });
+
+      // Canvas orqali hieroglif chizish
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#000000";
+      ctx.font = "bold 120px 'Noto Sans SC', 'Microsoft YaHei', 'SimHei', 'Heiti SC', sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(c.hanzi, canvas.width / 2, canvas.height / 2);
+
+      const imgData = canvas.toDataURL("image/png");
+      doc.addImage(imgData, "PNG", x + 3, y + 8, cellW - 6, cellH - 16);
     });
 
     doc.addPage();
 
+    // ===== BACK PAGE - Pinyin + English =====
     for (let r = 0; r < 5; r++) {
       let row = chunk.slice(r * 5, r * 5 + 5).reverse();
       row.forEach((c, col) => {
@@ -272,12 +291,29 @@ function downloadPDF() {
         const y = margin + r * cellH;
 
         doc.rect(x, y, cellW, cellH);
-        doc.text(
-          `${c.pinyin}\n${c.english}`,
-          x + cellW / 2,
-          y + cellH / 2,
-          { align: "center", baseline: "middle", maxWidth: cellW - 4 }
-        );
+
+        // Canvas orqali pinyin va english chizish
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#000000";
+
+        // Pinyin
+        ctx.font = "bold 36px Arial, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(c.pinyin, canvas.width / 2, 100);
+
+        // English (qisqartirish)
+        ctx.font = "28px Arial, sans-serif";
+        let eng = c.english;
+        if (eng.length > 18) {
+          eng = eng.substring(0, 16) + "...";
+        }
+        ctx.fillText(eng, canvas.width / 2, 200);
+
+        const imgData = canvas.toDataURL("image/png");
+        doc.addImage(imgData, "PNG", x + 3, y + 8, cellW - 6, cellH - 16);
       });
     }
   }
