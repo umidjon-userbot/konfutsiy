@@ -229,7 +229,103 @@ function renderPages(list){
     area.appendChild(back);
   }
 }
+async function downloadPDF(){
 
+  const mode = document.querySelector('input[name="mode"]:checked').value;
+  const count = parseInt(document.getElementById("countSelect").value);
+  const level = document.getElementById("levelSelect").value;
+
+  let list = [];
+
+  if(mode === "selected"){
+    if(selected.length === 0){
+      alert("Hech qanday flashcard qo‘shilmagan");
+      return;
+    }
+    list = [...selected];
+  }else{
+    list = getSmartRandom(level, count);
+  }
+
+  if(list.length === 0){
+    alert("So‘z topilmadi");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+
+  const doc = new jsPDF({
+    orientation: "portrait",
+    unit: "mm",
+    format: "a4"
+  });
+
+  const pageWidth = 210;
+  const pageHeight = 297;
+
+  const margin = 10;              // xavfsiz zona
+  const gridSize = 5;
+  const usableW = pageWidth - margin*2;
+  const usableH = pageHeight - margin*2;
+
+  const cellW = usableW / gridSize;
+  const cellH = usableH / gridSize;
+
+  function drawFront(chunk){
+    chunk.forEach((c, index)=>{
+      const row = Math.floor(index / 5);
+      const col = index % 5;
+
+      const x = margin + col * cellW;
+      const y = margin + row * cellH;
+
+      doc.rect(x, y, cellW, cellH);
+
+      doc.setFontSize(16);
+      doc.text(c.hanzi, x + cellW/2, y + cellH/2, {
+        align: "center",
+        baseline: "middle"
+      });
+    });
+  }
+
+  function drawBack(chunk){
+    for(let r=0; r<5; r++){
+      let row = chunk.slice(r*5, r*5+5).reverse();
+      row.forEach((c, col)=>{
+        const x = margin + col * cellW;
+        const y = margin + r * cellH;
+
+        doc.rect(x, y, cellW, cellH);
+
+        doc.setFontSize(10);
+        doc.text(
+          `${c.pinyin}\n${c.english}`,
+          x + cellW/2,
+          y + cellH/2,
+          {
+            align: "center",
+            baseline: "middle",
+            maxWidth: cellW - 4
+          }
+        );
+      });
+    }
+  }
+
+  for(let i=0;i<list.length;i+=25){
+
+    const chunk = list.slice(i,i+25);
+
+    if(i!==0) doc.addPage();
+    drawFront(chunk);
+
+    doc.addPage();
+    drawBack(chunk);
+  }
+
+  doc.save("flashcards_A4_duplex.pdf");
+}
 // ================= INIT =================
 document.addEventListener("DOMContentLoaded",async()=>{
   await loadAllHSK();
