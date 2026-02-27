@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html lang="uz">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Flashcard Login</title>
+
 <style>
 body{
   margin:0;
@@ -11,58 +12,64 @@ body{
   display:flex;
   justify-content:center;
   align-items:center;
-  background:#111;
-  font-family:Arial;
+  background:linear-gradient(135deg,#111,#1e3a8a);
+  font-family:Arial, sans-serif;
   color:white;
 }
-.box{
+
+.card{
+  background:#1f2937;
+  padding:40px;
+  border-radius:12px;
   text-align:center;
+  width:320px;
+  box-shadow:0 10px 25px rgba(0,0,0,.4);
 }
+
+h2{
+  margin-bottom:15px;
+}
+
+p{
+  font-size:14px;
+  opacity:.8;
+}
+
 button{
+  margin-top:20px;
   padding:10px 20px;
   border:none;
   background:#2563eb;
   color:white;
   border-radius:6px;
   cursor:pointer;
-  margin-top:15px;
+  width:100%;
+  font-size:14px;
 }
-button:hover{opacity:.9;}
+
+button:hover{
+  opacity:.9;
+}
 </style>
 </head>
+
 <body>
 
-<div class="box">
+<div class="card">
   <h2>Flashcard tizimi</h2>
-  <p id="status">Tekshirilmoqda...</p>
-  <button onclick="login()">Google Login</button>
+  <p id="status">Login qilish uchun Google tugmasini bosing</p>
+  <button onclick="login()">Google orqali kirish</button>
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { login, redirectIfLoggedIn } from "./auth.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBT1H17hj0xNHQScoBmJkdiuAlzy0qk1uY",
-  authDomain: "wuminjun-f4d97.firebaseapp.com",
-  projectId: "wuminjun-f4d97",
-};
+// Login tugmasi
+window.login = login;
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
-
-window.login = () => {
-  signInWithPopup(auth, provider);
-};
-
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    window.location.replace("dashboard.html");
-  } else {
-    document.getElementById("status").innerText = "Login qilinmagan";
-  }
-});
+// Agar allaqachon login qilingan bo‘lsa,
+// avtomatik dashboardga o'tadi
+redirectIfLoggedIn("dashboard.html");
 </script>
 
 </body>
