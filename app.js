@@ -56,6 +56,7 @@ function initSearch(){
 
 function performSearch(input){
   const box = document.getElementById("searchResult");
+  if(!box) return;
 
   if(!input){
     box.innerHTML="";
@@ -86,29 +87,10 @@ function addToFlashcards(hanzi){
   if(selected.find(s=>s.hanzi===hanzi)) return;
 
   selected.push(word);
-  updateSelectedUI();
 }
 
 function removeCard(hanzi){
   selected = selected.filter(w=>w.hanzi!==hanzi);
-  updateSelectedUI();
-}
-
-function updateSelectedUI(){
-  const list = document.getElementById("selectedList");
-  const count = document.getElementById("selectedCount");
-
-  count.innerText = selected.length;
-
-  list.innerHTML = selected.map(w=>`
-    <div class="selected-card">
-      <div class="hanzi">${w.hanzi}</div>
-      <div>${w.pinyin}</div>
-      <div>${w.english}</div>
-      <div class="level">${w.level}</div>
-      <button onclick="removeCard('${w.hanzi}')">Remove</button>
-    </div>
-  `).join("");
 }
 
 // ================= SMART RANDOM =================
@@ -145,6 +127,8 @@ function getSmartRandom(level, count){
 // ================= PRINT VIEW =================
 function renderPages(list){
   const area = document.getElementById("printArea");
+  if(!area) return;
+
   area.innerHTML="";
 
   for(let i=0;i<list.length;i+=25){
@@ -181,17 +165,15 @@ function renderPages(list){
 // ================= GENERATE =================
 function generatePrint(){
 
-  const mode = document.querySelector('input[name="mode"]:checked').value;
-  const count = parseInt(document.getElementById("countSelect").value);
-  const level = document.getElementById("levelSelect").value;
+  const mode = document.querySelector('input[name="mode"]:checked')?.value || "random";
+  const count = parseInt(document.getElementById("countSelect")?.value || 25);
+  const level = document.getElementById("levelSelect")?.value || 1;
 
   let list = [];
 
   if(mode === "selected"){
     list = selected.length ? [...selected] : getSmartRandom(level, count);
-  }
-
-  if(mode === "random"){
+  }else{
     list = getSmartRandom(level, count);
   }
 
@@ -199,7 +181,7 @@ function generatePrint(){
 }
 
 // ================= PDF DOWNLOAD =================
-async function downloadPDF(){
+function downloadPDF(){
 
   const mode = document.querySelector('input[name="mode"]:checked')?.value || "random";
   const count = parseInt(document.getElementById("countSelect")?.value || 25);
@@ -226,6 +208,9 @@ async function downloadPDF(){
     format: "a4"
   });
 
+  // 🔥 Built-in Chinese font
+  doc.addFont("STSong-Light", "stsong", "normal");
+
   const margin = 10;
   const usableW = 210 - margin*2;
   const usableH = 297 - margin*2;
@@ -238,6 +223,7 @@ async function downloadPDF(){
 
     if(i!==0) doc.addPage();
 
+    // ===== FRONT (Hanzi)
     chunk.forEach((c, index)=>{
       const row = Math.floor(index / 5);
       const col = index % 5;
@@ -245,6 +231,10 @@ async function downloadPDF(){
       const y = margin + row * cellH;
 
       doc.rect(x, y, cellW, cellH);
+
+      doc.setFont("stsong");
+      doc.setFontSize(18);
+
       doc.text(c.hanzi, x + cellW/2, y + cellH/2, {
         align:"center",
         baseline:"middle"
@@ -253,6 +243,7 @@ async function downloadPDF(){
 
     doc.addPage();
 
+    // ===== BACK (Pinyin + English)
     for(let r=0;r<5;r++){
       let row = chunk.slice(r*5,r*5+5).reverse();
 
@@ -261,6 +252,10 @@ async function downloadPDF(){
         const y = margin + r * cellH;
 
         doc.rect(x, y, cellW, cellH);
+
+        doc.setFont("helvetica");
+        doc.setFontSize(10);
+
         doc.text(
           `${c.pinyin}\n${c.english}`,
           x + cellW/2,
@@ -273,6 +268,7 @@ async function downloadPDF(){
 
   doc.save("flashcards_safe.pdf");
 }
+
 // ================= INIT =================
 document.addEventListener("DOMContentLoaded",async()=>{
   await loadAllHSK();
