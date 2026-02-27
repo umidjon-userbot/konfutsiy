@@ -259,7 +259,18 @@ async function downloadPDF(){
     unit: "mm",
     format: "a4"
   });
+const { jsPDF } = window.jspdf;
 
+const doc = new jsPDF({
+  orientation: "portrait",
+  unit: "mm",
+  format: "a4"
+});
+
+// FONT EMBED
+doc.addFileToVFS("NotoSansSC-Regular.otf", NOTO_BASE64);
+doc.addFont("NotoSansSC-Regular.otf", "NotoSansSC", "normal");
+ //kkkkkkkk
   // 🔥 Xitoy font aktivatsiya
   doc.setFont("helvetica"); // pinyin/english
   doc.addFont("STSong-Light", "stsong", "normal");
