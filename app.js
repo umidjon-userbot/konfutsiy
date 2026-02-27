@@ -191,36 +191,69 @@ async function loadAllHSK(){
   }
 }
 
-// ===== SEARCH =====
-function searchWord(){
-  const value = document.getElementById("searchInput").value.trim();
+// ===== SMART REAL-TIME SEARCH SYSTEM =====
+
+// tone olib tashlash
+function normalizePinyin(text){
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+// REAL TIME LISTENER
+function initSearch(){
+  const input = document.getElementById("searchInput");
+
+  input.addEventListener("input", function(){
+    const value = this.value.trim();
+    performSearch(value);
+  });
+}
+
+// SEARCH ENGINE
+function performSearch(input){
   const resultBox = document.getElementById("searchResult");
 
-  if(!value){
-    resultBox.innerHTML = "Iltimos so‘z kiriting";
+  if(!input){
+    resultBox.innerHTML = "";
     return;
   }
 
-  const found = hskDictionary.find(w => w.hanzi === value);
+  const search = normalizePinyin(input);
 
-  if(found){
-    resultBox.innerHTML = `
-      <div style="border:1px solid #000;padding:15px;">
-        <h2>${found.hanzi}</h2>
-        <p><strong>Pinyin:</strong> ${found.pinyin}</p>
-        <p><strong>Ma'nosi:</strong> ${found.uzbek || found.english || ""}</p>
-        <p><strong>Daraja:</strong> ${found.level}</p>
-      </div>
-    `;
-  } else {
-    resultBox.innerHTML = "Topilmadi (HSK1–6 ichida yo‘q)";
+  const results = hskDictionary.filter(w => {
+    const hanziMatch = w.hanzi.includes(input);
+    const pinyinMatch = normalizePinyin(w.pinyin).includes(search);
+    return hanziMatch || pinyinMatch;
+  });
+
+  if(results.length === 0){
+    resultBox.innerHTML = "<p>Topilmadi</p>";
+    return;
   }
+
+  resultBox.innerHTML = results.slice(0,50).map(w => `
+    <div style="
+      border:1px solid #ddd;
+      padding:12px;
+      margin:8px 0;
+      border-radius:8px;
+    ">
+      <h3 style="margin:0">${w.hanzi}</h3>
+      <div>${w.pinyin}</div>
+      <div>${w.uzbek || w.english || ""}</div>
+      <div style="font-size:12px;color:gray">${w.level}</div>
+    </div>
+  `).join("");
+}
 }
 // ================= INIT =================
 document.addEventListener("DOMContentLoaded",()=>{
 
   const session = getSession();
 loadAllHSK();
+initSearch();
   if(session){
     showApp();
     initApp();
