@@ -117,6 +117,29 @@ async function loadAllHSK(){
 }
 
 // ================= SEARCH =================
+function generatePrint(){
+
+  const level = document.getElementById("levelSelect").value;
+  const count = parseInt(document.getElementById("countSelect").value);
+
+  // agar searchdan tanlangan bo'lsa
+  if(selected.length > 0){
+    renderPages(selected);
+    return;
+  }
+
+  // aks holda leveldan random tanlaydi
+  const levelWords = hskDictionary.filter(w => w.level === "HSK"+level);
+
+  if(levelWords.length === 0){
+    alert("So‘zlar topilmadi");
+    return;
+  }
+
+  const randomWords = shuffleArray([...levelWords]).slice(0,count);
+
+  renderPages(randomWords);
+}
 function normalizePinyin(text){
   return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
 }
