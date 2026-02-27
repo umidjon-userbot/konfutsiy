@@ -63,7 +63,7 @@ onAuthStateChanged(auth, (user) => {
     document.getElementById("userInfo").innerText = "👤 " + user.displayName;
   }
 });
-  //////
+
 <script type="module">
 import { requireAuth, logout, setUserInfo } from "./auth.js";
 
@@ -76,7 +76,8 @@ window.openApp = () => {
   window.location.href = "index-2.html";
 };
 </script>
-  /////
+
+  
 window.logout = () => {
   signOut(auth).then(() => {
     window.location.replace("index.html");
