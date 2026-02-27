@@ -176,14 +176,18 @@ function generatePrint(){
 
   let listToPrint = [];
 
+  // Rejim: Selected
   if(mode === "selected"){
-    if(selected.length === 0){
-      alert("Hech qanday flashcard qo‘shilmagan");
-      return;
+
+    if(selected.length > 0){
+      listToPrint = [...selected];
+    }else{
+      // Agar selected bo‘sh bo‘lsa avtomatik random ishlasin
+      listToPrint = getSmartRandom(level, count);
     }
-    listToPrint = [...selected];
   }
 
+  // Rejim: Random
   if(mode === "random"){
     listToPrint = getSmartRandom(level, count);
   }
