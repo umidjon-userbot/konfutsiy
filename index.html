@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcard</title>
+
+<style>
+body { font-family: Arial; margin: 0; padding: 0; }
+
+.header-bar {
+  background: #111;
+  color: white;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.login-box {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+button {
+  padding: 6px 10px;
+  cursor: pointer;
+  border: none;
+  background: #2563eb;
+  color: white;
+  border-radius: 5px;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header-bar">
+  <h2>Flashcard</h2>
+  <div class="login-box">
+    <span id="userInfo">Login qilinmagan</span>
+    <button onclick="login()">Google Login</button>
+    <button onclick="logout()">Logout</button>
+  </div>
+</div>
+
+<div style="padding:20px;">
+  <h3>Flashcard tizimi ishlayapti 🚀</h3>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+/* 🔴 BU YERNI O'ZGARTIRASIZ */
+const firebaseConfig = {
+  apiKey: "API_KEY",
+  authDomain: "PROJECT_ID.firebaseapp.com",
+  projectId: "PROJECT_ID",
+};
+/* 🔴 SHU JOYNI O'ZGARTIRISH KERAK */
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+window.login = function() {
+  signInWithPopup(auth, provider)
+    .then(result => {
+      const user = result.user;
+      localStorage.setItem("flashUser", JSON.stringify({
+        name: user.displayName,
+        email: user.email,
+        photo: user.photoURL
+      }));
+      updateUI();
+    })
+    .catch(error => alert(error.message));
+}
+
+window.logout = function() {
+  signOut(auth).then(() => {
+    localStorage.removeItem("flashUser");
+    updateUI();
+  });
+}
+
+function updateUI() {
+  const data = localStorage.getItem("flashUser");
+  const userInfo = document.getElementById("userInfo");
+
+  if (data) {
+    const user = JSON.parse(data);
+    userInfo.innerHTML = "👤 " + user.name;
+  } else {
+    userInfo.innerHTML = "Login qilinmagan";
+  }
+}
+
+updateUI();
+</script>
+
+</body>
+</html>
