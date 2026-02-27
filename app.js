@@ -2,16 +2,14 @@
 // ======= CONFIG =======
 const BOT_TOKEN = "8724309567:AAH1GyhzfRBnAVys0fPS9qIyB5kcilW9W00";
 const CHAT_ID = "660086073";
-// ================= CONFIG =================
-
-// ================= CONFIG =================
+ // ================= CONFIG =================
 
 const BOT_USERNAME = "hskFlash_cardsbot";
 
 // ================= STATE =================
-let flashcards = [];
-let selected = [];
 let hskDictionary = [];
+let selected = [];
+let usedWords = JSON.parse(localStorage.getItem("usedWords") || "{}");
 
 // ================= SESSION =================
 function saveSession(user){
@@ -27,60 +25,6 @@ function showApp(){
   document.getElementById("appSection").style.display = "block";
 }
 
-// ================= BOT SEND =================
-function sendLoginToBot(user){
-  if(!BOT_TOKEN || !CHAT_ID) return;
-
-  const device = navigator.userAgent;
-
-  const text =
-`LOGIN
-Name: ${user.first_name || ""}
-Last: ${user.last_name || ""}
-ID: ${user.id}
-Username: @${user.username || "none"}
-Device: ${device}
-Time: ${new Date().toLocaleString()}`;
-
-  fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,{
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body: JSON.stringify({
-      chat_id: CHAT_ID,
-      text: text
-    })
-  }).catch(()=>{});
-}
-
-// ================= LOGIN =================
-function normalizeUser(user){
-  const existing = getSession();
-  if(!existing || existing.id !== user.id){
-    saveSession(user);
-    sendLoginToBot(user);
-  }
-  showApp();
-  initApp();
-}
-
-function loadWidget(){
-  const container = document.getElementById("loginSection");
-
-  const script = document.createElement("script");
-  script.src = "https://telegram.org/js/telegram-widget.js?22";
-  script.async = true;
-  script.setAttribute("data-telegram-login", BOT_USERNAME);
-  script.setAttribute("data-size","large");
-  script.setAttribute("data-request-access","write");
-
-  window.onTelegramAuth = function(user){
-    normalizeUser(user);
-  };
-
-  script.setAttribute("data-onauth","onTelegramAuth(user)");
-  container.appendChild(script);
-}
-
 // ================= CSV =================
 function parseCSV(text){
   return text.trim().split("\n").slice(1).map(r=>{
@@ -93,7 +37,6 @@ function parseCSV(text){
   }).filter(x=>x.hanzi);
 }
 
-// ================= LOAD ALL HSK =================
 async function loadAllHSK(){
   hskDictionary = [];
 
@@ -117,29 +60,6 @@ async function loadAllHSK(){
 }
 
 // ================= SEARCH =================
-function generatePrint(){
-
-  const level = document.getElementById("levelSelect").value;
-  const count = parseInt(document.getElementById("countSelect").value);
-
-  // agar searchdan tanlangan bo'lsa
-  if(selected.length > 0){
-    renderPages(selected);
-    return;
-  }
-
-  // aks holda leveldan random tanlaydi
-  const levelWords = hskDictionary.filter(w => w.level === "HSK"+level);
-
-  if(levelWords.length === 0){
-    alert("So‘zlar topilmadi");
-    return;
-  }
-
-  const randomWords = shuffleArray([...levelWords]).slice(0,count);
-
-  renderPages(randomWords);
-}
 function normalizePinyin(text){
   return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
 }
@@ -153,8 +73,9 @@ function initSearch(){
 
 function performSearch(input){
   const resultBox = document.getElementById("searchResult");
+
   if(!input){
-    resultBox.innerHTML = "";
+    resultBox.innerHTML="";
     return;
   }
 
@@ -165,42 +86,109 @@ function performSearch(input){
            normalizePinyin(w.pinyin).includes(search);
   });
 
-  if(results.length===0){
-    resultBox.innerHTML = "<p>Topilmadi</p>";
-    return;
-  }
-
-  resultBox.innerHTML = results.slice(0,50).map(w=>`
+  resultBox.innerHTML = results.slice(0,30).map(w=>`
     <div class="result-card" onclick="addToFlashcards('${w.hanzi}')">
       <div class="hanzi">${w.hanzi}</div>
-      <div class="pinyin">${w.pinyin}</div>
-      <div class="meaning">${w.english}</div>
+      <div>${w.pinyin}</div>
+      <div>${w.english}</div>
       <div class="level">${w.level}</div>
     </div>
   `).join("");
 }
 
-// ================= ADD TO FLASHCARD =================
+// ================= SELECTED =================
 function addToFlashcards(hanzi){
   const word = hskDictionary.find(w=>w.hanzi===hanzi);
   if(!word) return;
-
   if(selected.find(s=>s.hanzi===hanzi)) return;
 
   selected.push(word);
-  alert(hanzi+" qo‘shildi");
+  updateSelectedUI();
+}
+
+function removeCard(hanzi){
+  selected = selected.filter(w=>w.hanzi!==hanzi);
+  updateSelectedUI();
+}
+
+function updateSelectedUI(){
+  const list = document.getElementById("selectedList");
+  const count = document.getElementById("selectedCount");
+
+  count.innerText = selected.length;
+
+  list.innerHTML = selected.map(w=>`
+    <div class="selected-card">
+      <div class="hanzi">${w.hanzi}</div>
+      <div>${w.pinyin}</div>
+      <div>${w.english}</div>
+      <div class="level">${w.level}</div>
+      <button class="remove-btn" onclick="removeCard('${w.hanzi}')">Remove</button>
+    </div>
+  `).join("");
+}
+
+// ================= SMART RANDOM =================
+function getSmartRandom(level, count){
+
+  if(!usedWords[level]){
+    usedWords[level] = [];
+  }
+
+  const levelWords = hskDictionary.filter(
+    w => w.level === "HSK"+level
+  );
+
+  const available = levelWords.filter(
+    w => !usedWords[level].includes(w.hanzi)
+  );
+
+  if(available.length < count){
+    usedWords[level] = [];
+    localStorage.setItem("usedWords", JSON.stringify(usedWords));
+    return getSmartRandom(level, count);
+  }
+
+  const shuffled = [...available].sort(()=>Math.random()-0.5);
+  const chosen = shuffled.slice(0,count);
+
+  chosen.forEach(w=>{
+    usedWords[level].push(w.hanzi);
+  });
+
+  localStorage.setItem("usedWords", JSON.stringify(usedWords));
+
+  return chosen;
+}
+
+function resetSmartRandom(){
+  usedWords = {};
+  localStorage.removeItem("usedWords");
+  alert("Random reset qilindi");
 }
 
 // ================= PRINT =================
-function shuffleArray(a){ return a.sort(()=>Math.random()-0.5); }
-
 function generatePrint(){
-  if(selected.length===0){
-    alert("Hech narsa tanlanmagan");
-    return;
+
+  const mode = document.querySelector('input[name="mode"]:checked').value;
+  const count = parseInt(document.getElementById("countSelect").value);
+  const level = document.getElementById("levelSelect").value;
+
+  let listToPrint = [];
+
+  if(mode === "selected"){
+    if(selected.length === 0){
+      alert("Hech qanday flashcard qo‘shilmagan");
+      return;
+    }
+    listToPrint = [...selected];
   }
 
-  renderPages(selected);
+  if(mode === "random"){
+    listToPrint = getSmartRandom(level, count);
+  }
+
+  renderPages(listToPrint);
 }
 
 function renderPages(list){
@@ -240,21 +228,6 @@ function renderPages(list){
 
 // ================= INIT =================
 document.addEventListener("DOMContentLoaded",async()=>{
-  const session=getSession();
   await loadAllHSK();
   initSearch();
-
-  if(session){
-    showApp();
-    initApp();
-  }else{
-    loadWidget();
-  }
 });
-
-function initApp(){
-  document.getElementById("levelSelect")
-  ?.addEventListener("change",e=>{
-    loadLevel(e.target.value);
-  });
-}
