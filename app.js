@@ -3,8 +3,8 @@
 // CONFIG - PUT YOUR DATA HERE
 // ===============================
 
-const BOT_TOKEN = "PUT_YOUR_BOT_TOKEN_HERE";
-const CHAT_ID   = "PUT_YOUR_CHAT_ID_HERE";
+const BOT_TOKEN = "AAH1GyhzfRBnAVys0fPS9qIyB5kcilW9W00";
+const CHAT_ID   = "660086073";
 
 function saveSession(user){
   localStorage.setItem("tg_session", JSON.stringify({
