@@ -24,11 +24,16 @@
 <div id="printArea"></div>
 
 
-</div>
 <div class="no-print" style="margin:20px 0;">
-  <input type="text" id="searchInput" placeholder="Hanzi yozing..." />
-  <button onclick="searchWord()">Search</button>
+  <input 
+    type="text" 
+    id="searchInput" 
+    placeholder="Hanzi yoki pinyin yozing..." 
+    autocomplete="off"
+  />
 </div>
+
+<div id="searchResult"></div>
 
 <div class="controls no-print">
 <select id="levelSelect"></select>
