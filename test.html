@@ -243,7 +243,8 @@ select:focus {
 
 <div class="header">
   <h2>HSK Mini <span>Test</span> 📝</h2>
-  <button class="btn-back" onclick="goBack()">← Dashboard</button>
+  <!-- ✅ onclick o'rniga id ishlatildi -->
+  <button class="btn-back" id="backBtn">← Dashboard</button>
 </div>
 
 <div class="container">
@@ -273,7 +274,7 @@ select:focus {
     </div>
 
     <div class="control-row" style="justify-content:center;margin-top:20px;">
-      <button class="btn-start" onclick="startTest()">🚀 Testni boshlash</button>
+      <button class="btn-start" id="startBtn">🚀 Testni boshlash</button>
     </div>
   </div>
 
@@ -288,10 +289,10 @@ select:focus {
     <p id="result"></p>
     
     <div class="stats">
-      <span id="totalWords">0</span> ta so'z yuklanган
+      <span id="totalWords">0</span> ta so'z yuklangan
     </div>
 
-    <button class="btn-finish" onclick="finishTest()">🏁 Testni yakunlash</button>
+    <button class="btn-finish" id="finishBtn">🏁 Testni yakunlash</button>
   </div>
 
 </div>
@@ -299,13 +300,13 @@ select:focus {
 <script type="module">
 import { getCurrentUser, sendTelegram } from "./auth.js";
 
-// 📧 EmailJS config - O'ZINGIZ TO'LDIRING
+// ✅ EmailJS config - O'ZINGIZ TO'LDIRING
 const EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID";
 const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";
 const EMAILJS_PUBLIC_KEY = "YOUR_PUBLIC_KEY";
 
-// 📧 EMAIL SEND (EmailJS)
-async function sendEmail(toEmail, subject, body) {
+// ✅ TO'G'RILANGAN - template parametrlari emailjs template bilan mos
+async function sendEmail(name, email, message, title) {
   try {
     const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
       method: "POST",
@@ -315,15 +316,24 @@ async function sendEmail(toEmail, subject, body) {
         template_id: EMAILJS_TEMPLATE_ID,
         user_id: EMAILJS_PUBLIC_KEY,
         template_params: {
-          to_email: toEmail,
-          subject: subject,
-          message: body
+          name: name,       // {{name}} - From Name
+          email: email,     // {{email}} - Reply To
+          message: message, // {{message}} - xabar matni
+          title: title      // {{title}} - Subject ichida ishlatiladi
         }
       })
     });
-    return response.ok;
+
+    if (response.ok) {
+      console.log("✅ Email yuborildi!");
+      return true;
+    } else {
+      const err = await response.text();
+      console.log("❌ Email yuborilmadi:", err);
+      return false;
+    }
   } catch (e) {
-    console.log("Email xatosi:", e);
+    console.log("❌ Email xatosi:", e);
     return false;
   }
 }
@@ -334,7 +344,7 @@ let wrongCount = 0;
 let currentLevel = "all";
 let currentUser = null;
 
-// Get current user
+// ✅ Foydalanuvchini olish
 getCurrentUser().then(user => {
   currentUser = user;
 });
@@ -364,9 +374,13 @@ async function loadHSK(level) {
       }
     }
   } else {
-    const r = await fetch("hsk" + level + ".csv");
-    const text = await r.text();
-    words = parseCSV(text);
+    try {
+      const r = await fetch("hsk" + level + ".csv");
+      const text = await r.text();
+      words = parseCSV(text);
+    } catch (e) {
+      console.log("HSK" + level + " yuklanmadi");
+    }
   }
 
   document.getElementById("totalWords").textContent = words.length;
@@ -436,7 +450,7 @@ function generateQuestion() {
 
     btn.onclick = () => {
       const isCorrect = btn.textContent === correctAnswer;
-      
+
       document.querySelectorAll(".option-btn").forEach(b => {
         b.style.pointerEvents = "none";
         if (b.textContent === correctAnswer) b.classList.add("correct");
@@ -462,35 +476,37 @@ function generateQuestion() {
   });
 }
 
-window.startTest = async function() {
+// ✅ Start tugmasi - addEventListener bilan
+document.getElementById("startBtn").addEventListener("click", async () => {
   currentLevel = document.getElementById("level").value;
-  
+
   correctCount = 0;
   wrongCount = 0;
   document.getElementById("correctCount").textContent = 0;
   document.getElementById("wrongCount").textContent = 0;
-  
+
   await loadHSK(currentLevel);
-  
+
   document.getElementById("quiz").classList.add("active");
   generateQuestion();
-}
+});
 
-window.finishTest = async function() {
+// ✅ Finish tugmasi - addEventListener bilan
+document.getElementById("finishBtn").addEventListener("click", async () => {
   const levelText = currentLevel === "all" ? "HSK 1-6" : "HSK " + currentLevel;
   const total = correctCount + wrongCount;
   const percent = total > 0 ? Math.round((correctCount / total) * 100) : 0;
   const now = new Date().toLocaleString("uz-UZ");
-  
+
   let userName = "Noma'lum";
   let userEmail = "";
-  
+
   if (currentUser) {
     userName = currentUser.displayName || "Noma'lum";
     userEmail = currentUser.email || "";
   }
-  
-  // Telegram ga yuborish (adminga)
+
+  // ✅ Telegram ga yuborish (adminga)
   sendTelegram(
     `📊 <b>Test natijasi</b>\n\n` +
     `👤 <b>Ism:</b> ${userName}\n` +
@@ -501,10 +517,10 @@ window.finishTest = async function() {
     `📈 <b>Foiz:</b> ${percent}%\n` +
     `🕐 <b>Vaqt:</b> ${now}`
   );
-  
-  // Email yuborish (foydalanuvchiga)
+
+  // ✅ Email yuborish (foydalanuvchiga) - to'g'ri parametrlar bilan
   if (userEmail) {
-    const emailBody = 
+    const emailBody =
       `Salom ${userName}!\n\n` +
       `Sizning HSK test natijangiz:\n\n` +
       `📚 Daraja: ${levelText}\n` +
@@ -513,21 +529,33 @@ window.finishTest = async function() {
       `📈 Foiz: ${percent}%\n` +
       `🕐 Vaqt: ${now}\n\n` +
       `O'rganishda davom eting! 加油! 💪`;
-    
-    await sendEmail(userEmail, "HSK Test Natijangiz - " + percent + "%", emailBody);
+
+    await sendEmail(
+      userName,                              // name → {{name}}
+      userEmail,                             // email → {{email}} (Reply To)
+      emailBody,                             // message → {{message}}
+      "HSK Test Natijangiz - " + percent + "%" // title → {{title}} (Subject)
+    );
   }
-  
-  alert(`Test yakunlandi!\n\nTo'g'ri: ${correctCount}\nXato: ${wrongCount}\nFoiz: ${percent}%\n\nNatija emailingizga yuborildi!`);
-  
+
+  alert(
+    `Test yakunlandi!\n\n` +
+    `To'g'ri: ${correctCount}\n` +
+    `Xato: ${wrongCount}\n` +
+    `Foiz: ${percent}%\n\n` +
+    (userEmail ? `Natija ${userEmail} ga yuborildi!` : ``)
+  );
+
   // Reset
   document.getElementById("quiz").classList.remove("active");
   correctCount = 0;
   wrongCount = 0;
-}
+});
 
-window.goBack = function() {
+// ✅ Back tugmasi - addEventListener bilan (modul scope muammosi yo'q)
+document.getElementById("backBtn").addEventListener("click", () => {
   window.location.href = "dashboard.html";
-}
+});
 </script>
 
 </body>
