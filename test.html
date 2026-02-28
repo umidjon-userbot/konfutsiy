@@ -254,8 +254,8 @@ select:focus {
       <select id="mode">
         <option value="hanzi-pinyin">Hanzi → Pinyin</option>
         <option value="pinyin-hanzi">Pinyin → Hanzi</option>
-        <option value="hanzi-english">Hanzi → Uzbek/English</option>
-        <option value="english-hanzi">Uzbek/English → Hanzi</option>
+        <option value="hanzi-english">Hanzi → English</option>
+        <option value="english-hanzi">English → Hanzi</option>
       </select>
     </div>
 
@@ -297,7 +297,7 @@ select:focus {
 </div>
 
 <script type="module">
-import { getCurrentUser, sendTelegram } from "./auth.js";
+import { getCurrentUser, sendTelegram, sendEmail } from "./auth.js";
 
 let words = [];
 let correctCount = 0;
@@ -447,7 +447,7 @@ window.startTest = async function() {
   generateQuestion();
 }
 
-window.finishTest = function() {
+window.finishTest = async function() {
   const levelText = currentLevel === "all" ? "HSK 1-6" : "HSK " + currentLevel;
   const total = correctCount + wrongCount;
   const percent = total > 0 ? Math.round((correctCount / total) * 100) : 0;
@@ -461,7 +461,7 @@ window.finishTest = function() {
     userEmail = currentUser.email || "";
   }
   
-  // Telegram ga yuborish
+  // Telegram ga yuborish (adminga)
   sendTelegram(
     `📊 <b>Test natijasi</b>\n\n` +
     `👤 <b>Ism:</b> ${userName}\n` +
@@ -473,7 +473,22 @@ window.finishTest = function() {
     `🕐 <b>Vaqt:</b> ${now}`
   );
   
-  alert(`Test yakunlandi!\n\nTo'g'ri: ${correctCount}\nXato: ${wrongCount}\nFoiz: ${percent}%`);
+  // Email yuborish (foydalanuvchiga)
+  if (userEmail) {
+    const emailBody = 
+      `Salom ${userName}!\n\n` +
+      `Sizning HSK test natijangiz:\n\n` +
+      `📚 Daraja: ${levelText}\n` +
+      `✅ To'g'ri: ${correctCount}\n` +
+      `❌ Xato: ${wrongCount}\n` +
+      `📈 Foiz: ${percent}%\n` +
+      `🕐 Vaqt: ${now}\n\n` +
+      `O'rganishda davom eting! 加油! 💪`;
+    
+    await sendEmail(userEmail, "HSK Test Natijangiz - " + percent + "%", emailBody);
+  }
+  
+  alert(`Test yakunlandi!\n\nTo'g'ri: ${correctCount}\nXato: ${wrongCount}\nFoiz: ${percent}%\n\nNatija emailingizga yuborildi!`);
   
   // Reset
   document.getElementById("quiz").classList.remove("active");
