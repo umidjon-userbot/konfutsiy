@@ -40,7 +40,17 @@ body {
 }
 
 #userInfo {
-  color: #ddd;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: white;
+}
+
+#userInfo img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.3);
 }
 
 .btn-logout {
@@ -201,11 +211,13 @@ body {
 </div>
 
 <script type="module">
-import { requireAuth, logout, setUserInfo } from "./auth.js";
+import { requireAuth, logout, setUserProfile } from "./auth.js";
 
 // Auth tekshirish
 requireAuth("index.html");
-setUserInfo("userInfo");
+
+// Profil ko'rsatish (rasm + ism + email)
+setUserProfile("userInfo");
 
 // Global funksiyalar
 window.logout = logout;
