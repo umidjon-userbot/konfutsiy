@@ -40,6 +40,13 @@ export async function sendTelegram(message) {
     console.log("Telegram xabar yuborilmadi:", e);
   }
 }
+//mail send
+// 📧 EmailJS config
+const EMAILJS_SERVICE_ID = "service_tpzfhmc";
+const EMAILJS_TEMPLATE_ID = "template_qr8x3no"; 
+const EMAILJS_PUBLIC_KEY = "D2XmGLr_S2RZK8oeJ";
+
+
 
 // LOGIN
 export function login() {
