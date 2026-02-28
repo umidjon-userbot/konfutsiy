@@ -56,7 +56,7 @@ export async function sendTelegram(message) {
 }
 
 // 📧 EMAIL SEND (EmailJS)
-export async function sendEmail(toEmail, subject, body) {
+export async function sendEmail(name, email, message, title = "Contact") {
   try {
     const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
       method: "POST",
@@ -66,9 +66,10 @@ export async function sendEmail(toEmail, subject, body) {
         template_id: EMAILJS_TEMPLATE_ID,
         user_id: EMAILJS_PUBLIC_KEY,
         template_params: {
-          to_email: toEmail,
-          subject: subject,
-          message: body
+          name: name,       // {{name}}
+          email: email,     // {{email}} - Reply To uchun
+          message: message, // {{message}}
+          title: title      // {{title}} - Subject uchun
         }
       })
     });
@@ -77,7 +78,7 @@ export async function sendEmail(toEmail, subject, body) {
       console.log("Email yuborildi!");
       return true;
     } else {
-      console.log("Email yuborilmadi");
+      console.log("Email yuborilmadi:", await response.text());
       return false;
     }
   } catch (e) {
