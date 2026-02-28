@@ -297,7 +297,36 @@ select:focus {
 </div>
 
 <script type="module">
-import { getCurrentUser, sendTelegram, sendEmail } from "./auth.js";
+import { getCurrentUser, sendTelegram } from "./auth.js";
+
+// 📧 EmailJS config - O'ZINGIZ TO'LDIRING
+const EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID";
+const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";
+const EMAILJS_PUBLIC_KEY = "YOUR_PUBLIC_KEY";
+
+// 📧 EMAIL SEND (EmailJS)
+async function sendEmail(toEmail, subject, body) {
+  try {
+    const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        service_id: EMAILJS_SERVICE_ID,
+        template_id: EMAILJS_TEMPLATE_ID,
+        user_id: EMAILJS_PUBLIC_KEY,
+        template_params: {
+          to_email: toEmail,
+          subject: subject,
+          message: body
+        }
+      })
+    });
+    return response.ok;
+  } catch (e) {
+    console.log("Email xatosi:", e);
+    return false;
+  }
+}
 
 let words = [];
 let correctCount = 0;
