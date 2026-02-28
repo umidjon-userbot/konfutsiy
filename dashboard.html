@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcard Dashboard</title>
+<link rel="icon" href="favicon.ico">
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Noto Sans SC", Arial, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+/* Header */
+.header {
+  background: rgba(0,0,0,0.2);
+  color: white;
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  backdrop-filter: blur(10px);
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+#userInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: white;
+}
+
+#userInfo img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.3);
+}
+
+.btn-logout {
+  padding: 10px 20px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-logout:hover {
+  background: #dc2626;
+}
+
+/* Main */
+.main {
+  padding: 40px 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.welcome {
+  text-align: center;
+  color: white;
+  margin-bottom: 40px;
+}
+
+.welcome h2 {
+  font-size: 32px;
+  margin: 0 0 10px 0;
+}
+
+.welcome p {
+  font-size: 18px;
+  opacity: 0.9;
+}
+
+/* Cards Grid */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+}
+
+.card {
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+}
+
+.card-icon {
+  font-size: 50px;
+  margin-bottom: 15px;
+}
+
+.card h3 {
+  margin: 0 0 10px 0;
+  font-size: 22px;
+  color: #333;
+}
+
+.card p {
+  color: #666;
+  margin: 0 0 20px 0;
+  line-height: 1.5;
+}
+
+.card-btn {
+  display: inline-block;
+  padding: 12px 30px;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card-btn:hover {
+  transform: scale(1.05);
+}
+
+.btn-blue {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.btn-green {
+  background: linear-gradient(135deg, #11998e, #38ef7d);
+}
+
+.btn-orange {
+  background: linear-gradient(135deg, #f093fb, #f5576c);
+}
+
+.btn-purple {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 30px;
+  color: rgba(255,255,255,0.7);
+  font-size: 14px;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🀄 HSK Flashcard</h1>
+  <div class="user-info">
+    <span id="userInfo">Yuklanmoqda...</span>
+    <button class="btn-logout" onclick="logout()">Chiqish</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="welcome">
+    <h2>Xush kelibsiz! 👋</h2>
+    <p>Quyidagi bo'limlardan birini tanlang</p>
+  </div>
+
+  <div class="cards">
+    
+    <div class="card">
+      <div class="card-icon">📚</div>
+      <h3>Flashcard Generator</h3>
+      <p>So'zlarni qidiring, tanlang va chop etish uchun flashcard yarating. Old va orqa tomonli kartalar.</p>
+      <button class="card-btn btn-blue" onclick="openApp()">Ochish →</button>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">🔀</div>
+      <h3>HSK Shuffle</h3>
+      <p>HSK 1-6 so'zlarini aralashtiring va flashcard yarating. Hanzi, pinyin, tarjima bitta kartada.</p>
+      <button class="card-btn btn-green" onclick="openShuffle()">Ochish →</button>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">📝</div>
+      <h3>Mini Test</h3>
+      <p>O'zingizni sinab ko'ring! 4 ta variant bilan test. To'g'ri javoblar sonini kuzating.</p>
+      <button class="card-btn btn-orange" onclick="openTest()">Ochish →</button>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">📴</div>
+      <h3>Offline Test (PWA)</h3>
+      <p>Telefoningizga o'rnating va internetsiz ishlating. Offline rejimda test yechish.</p>
+      <button class="card-btn btn-purple" onclick="openOffline()">Ochish →</button>
+    </div>
+
+  </div>
+</div>
+
+<div class="footer">
+  Made with ❤️ for Chinese learners
+</div>
+
+<script type="module">
+import { requireAuth, logout, setUserProfile } from "./auth.js";
+
+// Auth tekshirish
+requireAuth("index.html");
+
+// Profil ko'rsatish (rasm + ism + email)
+setUserProfile("userInfo");
+
+// Global funksiyalar
+window.logout = logout;
+
+window.openApp = () => {
+  window.location.href = "index-2.html";
+};
+
+window.openShuffle = () => {
+  window.location.href = "flashcard-shuffle.html";
+};
+
+window.openTest = () => {
+  window.location.href = "test.html";
+};
+
+window.openOffline = () => {
+  window.location.href = "pwa/test.html";
+};
+</script>
+
+</body>
+</html>
