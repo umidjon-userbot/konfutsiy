@@ -20,8 +20,8 @@ const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
 // 📱 Telegram config
-const TELEGRAM_BOT_TOKEN = "YOUR_BOT_TOKEN"; // BotFather dan olingan token
-const TELEGRAM_CHAT_ID = "YOUR_CHAT_ID"; // Sizning chat ID
+const TELEGRAM_BOT_TOKEN = "8724309567:AAH1GyhzfRBnAVys0fPS9qIyB5kcilW9W00"; // BotFather dan olingan token
+const TELEGRAM_CHAT_ID = "660086073"; // Sizning chat ID
 
 // 📱 TELEGRAM SEND MESSAGE
 export async function sendTelegram(message) {
