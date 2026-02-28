@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HSK Mini Test</title>
+<link rel="icon" href="favicon.ico">
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Noto Sans SC", "Microsoft YaHei", Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  min-height: 100vh;
+  color: white;
+}
+
+/* Header */
+.header {
+  background: rgba(0,0,0,0.3);
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  backdrop-filter: blur(10px);
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.header h2 span {
+  color: #00ff88;
+}
+
+.btn-back {
+  padding: 10px 20px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.btn-back:hover {
+  background: #dc2626;
+}
+
+/* Main container */
+.container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 30px 20px;
+}
+
+/* Controls */
+.controls {
+  background: rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 30px;
+  backdrop-filter: blur(10px);
+}
+
+.control-row {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.control-row:last-child {
+  margin-bottom: 0;
+}
+
+.control-row label {
+  font-weight: bold;
+  min-width: 100px;
+  color: #ccc;
+}
+
+select {
+  padding: 12px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.9);
+  color: #333;
+  cursor: pointer;
+  outline: none;
+}
+
+select:focus {
+  box-shadow: 0 0 0 3px rgba(0,255,136,0.3);
+}
+
+.btn-start {
+  padding: 14px 40px;
+  font-size: 18px;
+  font-weight: bold;
+  background: linear-gradient(135deg, #00ff88, #00cc6a);
+  color: #1a1a2e;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-start:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0,255,136,0.4);
+}
+
+/* Quiz area */
+#quiz {
+  display: none;
+  background: rgba(255,255,255,0.05);
+  border-radius: 20px;
+  padding: 40px 30px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+#quiz.active {
+  display: block;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Question */
+#question {
+  font-size: 80px;
+  font-weight: bold;
+  margin: 20px 0 40px 0;
+  text-shadow: 0 4px 20px rgba(0,255,136,0.3);
+}
+
+/* Options */
+#options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.option-btn {
+  padding: 20px;
+  font-size: 22px;
+  background: rgba(255,255,255,0.1);
+  color: white;
+  border: 2px solid rgba(255,255,255,0.2);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.option-btn:hover {
+  background: rgba(255,255,255,0.2);
+  border-color: #00ff88;
+  transform: scale(1.02);
+}
+
+.option-btn.correct {
+  background: #10b981;
+  border-color: #10b981;
+}
+
+.option-btn.wrong {
+  background: #ef4444;
+  border-color: #ef4444;
+}
+
+/* Result */
+#result {
+  font-size: 24px;
+  font-weight: bold;
+  min-height: 40px;
+}
+
+/* Score */
+.score-bar {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-bottom: 20px;
+  font-size: 18px;
+}
+
+.score-item {
+  background: rgba(255,255,255,0.1);
+  padding: 10px 25px;
+  border-radius: 30px;
+}
+
+.score-item.correct {
+  color: #00ff88;
+}
+
+.score-item.wrong {
+  color: #ff6b6b;
+}
+
+/* Stats */
+.stats {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  color: #888;
+  font-size: 14px;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h2>HSK Mini <span>Test</span> 📝</h2>
+  <button class="btn-back" onclick="goBack()">← Dashboard</button>
+</div>
+
+<div class="container">
+  
+  <div class="controls">
+    <div class="control-row">
+      <label>Rejim:</label>
+      <select id="mode">
+        <option value="hanzi-pinyin">Hanzi → Pinyin</option>
+        <option value="pinyin-hanzi">Pinyin → Hanzi</option>
+        <option value="hanzi-english">Hanzi → English</option>
+        <option value="english-hanzi">English → Hanzi</option>
+      </select>
+    </div>
+
+    <div class="control-row">
+      <label>Daraja:</label>
+      <select id="level">
+        <option value="all">HSK 1-6 (Hammasi)</option>
+        <option value="1">HSK 1</option>
+        <option value="2">HSK 2</option>
+        <option value="3">HSK 3</option>
+        <option value="4">HSK 4</option>
+        <option value="5">HSK 5</option>
+        <option value="6">HSK 6</option>
+      </select>
+    </div>
+
+    <div class="control-row" style="justify-content:center;margin-top:20px;">
+      <button class="btn-start" onclick="startTest()">🚀 Testni boshlash</button>
+    </div>
+  </div>
+
+  <div id="quiz">
+    <div class="score-bar">
+      <div class="score-item correct">✅ To'g'ri: <span id="correctCount">0</span></div>
+      <div class="score-item wrong">❌ Xato: <span id="wrongCount">0</span></div>
+    </div>
+    
+    <h1 id="question"></h1>
+    <div id="options"></div>
+    <p id="result"></p>
+    
+    <div class="stats">
+      <span id="totalWords">0</span> ta so'z yuklanган
+    </div>
+  </div>
+
+</div>
+
+<script>
+let words = [];
+let currentQuestion = null;
+let correctCount = 0;
+let wrongCount = 0;
+
+function parseCSV(text) {
+  return text.trim().split("\n").slice(1).map(r => {
+    const c = r.split(",");
+    return {
+      hanzi: c[0]?.trim(),
+      pinyin: c[1]?.trim(),
+      english: c[2]?.trim()
+    };
+  }).filter(x => x.hanzi);
+}
+
+async function loadHSK(level) {
+  words = [];
+
+  if (level === "all") {
+    for (let i = 1; i <= 6; i++) {
+      try {
+        const r = await fetch("hsk" + i + ".csv");
+        const text = await r.text();
+        words.push(...parseCSV(text));
+      } catch (e) {
+        console.log("HSK" + i + " yuklanmadi");
+      }
+    }
+  } else {
+    const r = await fetch("hsk" + level + ".csv");
+    const text = await r.text();
+    words = parseCSV(text);
+  }
+
+  document.getElementById("totalWords").textContent = words.length;
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function generateQuestion() {
+  const mode = document.getElementById("mode").value;
+  const questionEl = document.getElementById("question");
+  const optionsEl = document.getElementById("options");
+  const resultEl = document.getElementById("result");
+
+  resultEl.textContent = "";
+  optionsEl.innerHTML = "";
+
+  const correct = words[Math.floor(Math.random() * words.length)];
+  currentQuestion = correct;
+
+  let questionText, correctAnswer, getOption;
+
+  switch (mode) {
+    case "hanzi-pinyin":
+      questionText = correct.hanzi;
+      correctAnswer = correct.pinyin;
+      getOption = w => w.pinyin;
+      break;
+    case "pinyin-hanzi":
+      questionText = correct.pinyin;
+      correctAnswer = correct.hanzi;
+      getOption = w => w.hanzi;
+      break;
+    case "hanzi-english":
+      questionText = correct.hanzi;
+      correctAnswer = correct.english;
+      getOption = w => w.english;
+      break;
+    case "english-hanzi":
+      questionText = correct.english;
+      correctAnswer = correct.hanzi;
+      getOption = w => w.hanzi;
+      break;
+  }
+
+  questionEl.textContent = questionText;
+
+  let optionList = [correct];
+  while (optionList.length < 4) {
+    const random = words[Math.floor(Math.random() * words.length)];
+    if (!optionList.find(o => getOption(o) === getOption(random))) {
+      optionList.push(random);
+    }
+  }
+
+  optionList = shuffle(optionList);
+
+  optionList.forEach(w => {
+    const btn = document.createElement("button");
+    btn.className = "option-btn";
+    btn.textContent = getOption(w);
+
+    btn.onclick = () => {
+      const isCorrect = btn.textContent === correctAnswer;
+      
+      // Disable all buttons
+      document.querySelectorAll(".option-btn").forEach(b => {
+        b.style.pointerEvents = "none";
+        if (getOption(optionList.find(o => getOption(o) === b.textContent)) === correctAnswer) {
+          b.classList.add("correct");
+        }
+      });
+
+      if (isCorrect) {
+        btn.classList.add("correct");
+        resultEl.textContent = "✅ To'g'ri!";
+        resultEl.style.color = "#00ff88";
+        correctCount++;
+        document.getElementById("correctCount").textContent = correctCount;
+      } else {
+        btn.classList.add("wrong");
+        resultEl.textContent = "❌ Xato! Javob: " + correctAnswer;
+        resultEl.style.color = "#ff6b6b";
+        wrongCount++;
+        document.getElementById("wrongCount").textContent = wrongCount;
+      }
+
+      setTimeout(generateQuestion, 1500);
+    };
+
+    optionsEl.appendChild(btn);
+  });
+}
+
+async function startTest() {
+  const level = document.getElementById("level").value;
+  
+  // Reset scores
+  correctCount = 0;
+  wrongCount = 0;
+  document.getElementById("correctCount").textContent = 0;
+  document.getElementById("wrongCount").textContent = 0;
+  
+  await loadHSK(level);
+  
+  document.getElementById("quiz").classList.add("active");
+  generateQuestion();
+}
+
+function goBack() {
+  window.location.href = "dashboard.html";
+}
+</script>
+
+</body>
+</html>
