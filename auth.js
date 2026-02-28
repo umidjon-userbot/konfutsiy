@@ -26,15 +26,6 @@ const provider = new GoogleAuthProvider();
 const TELEGRAM_BOT_TOKEN = "8724309567:AAH1GyhzfRBnAVys0fPS9qIyB5kcilW9W00"; // BotFather dan olingan token
 const TELEGRAM_CHAT_ID = "660086073"; // Sizning chat ID
 
-// auth.js
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { 
-  getAuth, 
-  GoogleAuthProvider, 
-  signInWithPopup, 
-  signOut, 
-  onAuthStateChanged 
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 
 // 📱 TELEGRAM SEND MESSAGE
