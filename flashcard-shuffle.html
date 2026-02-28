@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HSK Flashcard Shuffle</title>
+<link rel="icon" href="favicon.ico">
+<style>
+/* ================= BASE ================= */
+@page {
+  size: A4;
+  margin: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Noto Sans SC", "Microsoft YaHei", "SimHei", Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background: #f5f5f5;
+}
+
+/* ================= HEADER ================= */
+.header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  background: white;
+  padding: 15px 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.header-bar h2 {
+  margin: 0;
+  color: #333;
+}
+
+.led-clock {
+  font-family: 'Courier New', monospace;
+  font-size: 20px;
+  letter-spacing: 2px;
+  background: black;
+  color: #00ff66;
+  padding: 8px 14px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px #00ff66;
+  text-shadow: 0 0 5px #00ff66;
+}
+
+/* ================= CONTROLS ================= */
+.controls {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+.control-row {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.control-row:last-child {
+  margin-bottom: 0;
+}
+
+.control-row label {
+  font-weight: bold;
+  min-width: 120px;
+}
+
+.control-row select,
+.control-row input[type="number"] {
+  padding: 10px 15px;
+  font-size: 14px;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  outline: none;
+}
+
+.control-row select:focus,
+.control-row input:focus {
+  border-color: #4CAF50;
+}
+
+.btn {
+  padding: 12px 24px;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  font-weight: bold;
+}
+
+.btn-primary {
+  background: #4CAF50;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #45a049;
+}
+
+.btn-secondary {
+  background: #2196F3;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #1976D2;
+}
+
+.info-text {
+  color: #666;
+  font-size: 13px;
+  margin-top: 10px;
+}
+
+.status {
+  padding: 10px;
+  background: #e8f5e9;
+  border-radius: 6px;
+  color: #2e7d32;
+  font-weight: bold;
+}
+
+/* ================= FLASHCARD PAGES ================= */
+#printArea {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.page {
+  width: 210mm;
+  height: 297mm;
+  padding: 8mm;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  gap: 0;
+  page-break-after: always;
+  margin: 20px auto;
+  background: white;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+  border: 1px solid #ddd;
+}
+
+.card {
+  border: 1px solid #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4px;
+  overflow: hidden;
+}
+
+.card.front {
+  font-size: 36px;
+  font-weight: bold;
+}
+
+.card.back .pinyin {
+  font-size: 11px;
+  font-weight: bold;
+  margin-bottom: 3px;
+  color: #333;
+}
+
+.card.back .english {
+  font-size: 7px;
+  color: #555;
+  line-height: 1.2;
+}
+
+/* ================= PRINT STYLES ================= */
+@media print {
+  body {
+    margin: 0;
+    padding: 0;
+    background: white;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  #printArea {
+    padding: 0;
+    box-shadow: none;
+    border-radius: 0;
+  }
+
+  .page {
+    width: 210mm;
+    height: 297mm;
+    margin: 0;
+    padding: 8mm;
+    box-shadow: none;
+    border: none;
+    page-break-after: always;
+  }
+
+  .card.front {
+    font-size: 36px;
+  }
+
+  .card.back .pinyin {
+    font-size: 10px;
+  }
+
+  .card.back .english {
+    font-size: 6px;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="header-bar no-print">
+  <h2>HSK Flashcard Shuffle 🀄</h2>
+  <div id="ledClock" class="led-clock">00:00:00</div>
+</div>
+
+<div class="controls no-print">
+  <div class="control-row">
+    <label>HSK darajasi:</label>
+    <select id="levelSelect">
+      <option value="all">Hammasi (HSK 1-6)</option>
+      <option value="1">HSK 1</option>
+      <option value="2">HSK 2</option>
+      <option value="3">HSK 3</option>
+      <option value="4">HSK 4</option>
+      <option value="5">HSK 5</option>
+      <option value="6">HSK 6</option>
+    </select>
+  </div>
+
+  <div class="control-row">
+    <label>Kartalar soni:</label>
+    <select id="countSelect">
+      <option value="25">25</option>
+      <option value="50">50</option>
+      <option value="75">75</option>
+      <option value="100">100</option>
+      <option value="150">150</option>
+      <option value="200">200</option>
+      <option value="all">Hammasi</option>
+    </select>
+  </div>
+
+  <div class="control-row">
+    <button class="btn btn-primary" onclick="generateCards()">🔀 Shuffle & Generate</button>
+    <button class="btn btn-secondary" onclick="window.print()">🖨️ Print / Save PDF</button>
+  </div>
+
+  <div class="control-row">
+    <div id="status" class="status">Yuklanmoqda...</div>
+  </div>
+
+  <p class="info-text">💡 PDF saqlash: Print bosing → "Save as PDF" tanlang</p>
+</div>
+
+<div id="printArea"></div>
+
+<script>
+// ================= STATE =================
+let hskDictionary = [];
+
+// ================= LOAD CSV =================
+function parseCSV(text) {
+  return text.trim().split("\n").slice(1).map(r => {
+    const c = r.split(",");
+    return {
+      hanzi: c[0]?.trim(),
+      pinyin: c[1]?.trim(),
+      english: c[2]?.trim()
+    };
+  }).filter(x => x.hanzi);
+}
+
+async function loadAllHSK() {
+  hskDictionary = [];
+  let loaded = 0;
+
+  for (let i = 1; i <= 6; i++) {
+    try {
+      const r = await fetch("hsk" + i + ".csv");
+      if (!r.ok) continue;
+
+      const text = await r.text();
+      const words = parseCSV(text);
+
+      words.forEach(w => {
+        hskDictionary.push({
+          ...w,
+          level: i
+        });
+      });
+
+      loaded += words.length;
+    } catch (e) {
+      console.log("HSK" + i + " yuklanmadi:", e);
+    }
+  }
+
+  document.getElementById("status").textContent = 
+    "✅ Tayyor! Jami " + hskDictionary.length + " so'z yuklandi";
+}
+
+// ================= SHUFFLE =================
+function shuffle(array) {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// ================= GENERATE CARDS =================
+function generateCards() {
+  const level = document.getElementById("levelSelect").value;
+  const countValue = document.getElementById("countSelect").value;
+
+  // Filter by level
+  let words = [];
+  if (level === "all") {
+    words = [...hskDictionary];
+  } else {
+    words = hskDictionary.filter(w => w.level === parseInt(level));
+  }
+
+  // Shuffle
+  words = shuffle(words);
+
+  // Limit count
+  if (countValue !== "all") {
+    const count = parseInt(countValue);
+    words = words.slice(0, count);
+  }
+
+  if (words.length === 0) {
+    alert("So'z topilmadi!");
+    return;
+  }
+
+  renderPages(words);
+  
+  document.getElementById("status").textContent = 
+    "✅ " + words.length + " ta karta yaratildi";
+}
+
+// ================= RENDER PAGES =================
+function renderPages(list) {
+  const area = document.getElementById("printArea");
+  area.innerHTML = "";
+
+  for (let i = 0; i < list.length; i += 25) {
+    const chunk = list.slice(i, i + 25);
+
+    // FRONT PAGE - Hanzi
+    const front = document.createElement("div");
+    front.className = "page";
+
+    chunk.forEach(c => {
+      const d = document.createElement("div");
+      d.className = "card front";
+      d.innerText = c.hanzi;
+      front.appendChild(d);
+    });
+
+    // Fill empty cells
+    for (let j = chunk.length; j < 25; j++) {
+      const d = document.createElement("div");
+      d.className = "card front";
+      front.appendChild(d);
+    }
+
+    area.appendChild(front);
+
+    // BACK PAGE - Pinyin + English (reversed for printing)
+    const back = document.createElement("div");
+    back.className = "page";
+
+    for (let r = 0; r < 5; r++) {
+      const row = chunk.slice(r * 5, r * 5 + 5).reverse();
+
+      row.forEach(c => {
+        const d = document.createElement("div");
+        d.className = "card back";
+        d.innerHTML = '<div class="pinyin">' + c.pinyin + '</div><div class="english">' + c.english + '</div>';
+        back.appendChild(d);
+      });
+
+      // Fill row
+      for (let j = row.length; j < 5; j++) {
+        const d = document.createElement("div");
+        d.className = "card back";
+        back.appendChild(d);
+      }
+    }
+
+    area.appendChild(back);
+  }
+}
+
+// ================= LED CLOCK =================
+function startClock() {
+  const el = document.getElementById("ledClock");
+  if (!el) return;
+
+  function update() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2, "0");
+    const m = String(now.getMinutes()).padStart(2, "0");
+    const s = String(now.getSeconds()).padStart(2, "0");
+    el.textContent = h + ":" + m + ":" + s;
+  }
+
+  update();
+  setInterval(update, 1000);
+}
+
+// ================= INIT =================
+document.addEventListener("DOMContentLoaded", async () => {
+  startClock();
+  await loadAllHSK();
+});
+</script>
+
+</body>
+</html>
