@@ -14,6 +14,9 @@ const firebaseConfig = {
   authDomain: "wuminjun-f4d97.firebaseapp.com",
   projectId: "wuminjun-f4d97",
 };
+const EMAILJS_SERVICE_ID = "service_tpzfhmc";
+const EMAILJS_TEMPLATE_ID = "template_qr8x3no"; 
+const EMAILJS_PUBLIC_KEY = "D2XmGLr_S2RZK8oeJ";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -22,6 +25,17 @@ const provider = new GoogleAuthProvider();
 // 📱 Telegram config
 const TELEGRAM_BOT_TOKEN = "8724309567:AAH1GyhzfRBnAVys0fPS9qIyB5kcilW9W00"; // BotFather dan olingan token
 const TELEGRAM_CHAT_ID = "660086073"; // Sizning chat ID
+
+// auth.js
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { 
+  getAuth, 
+  GoogleAuthProvider, 
+  signInWithPopup, 
+  signOut, 
+  onAuthStateChanged 
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
 
 // 📱 TELEGRAM SEND MESSAGE
 export async function sendTelegram(message) {
@@ -40,13 +54,37 @@ export async function sendTelegram(message) {
     console.log("Telegram xabar yuborilmadi:", e);
   }
 }
-//mail send
-// 📧 EmailJS config
-const EMAILJS_SERVICE_ID = "service_tpzfhmc";
-const EMAILJS_TEMPLATE_ID = "template_qr8x3no"; 
-const EMAILJS_PUBLIC_KEY = "D2XmGLr_S2RZK8oeJ";
 
-
+// 📧 EMAIL SEND (EmailJS)
+export async function sendEmail(toEmail, subject, body) {
+  try {
+    const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        service_id: EMAILJS_SERVICE_ID,
+        template_id: EMAILJS_TEMPLATE_ID,
+        user_id: EMAILJS_PUBLIC_KEY,
+        template_params: {
+          to_email: toEmail,
+          subject: subject,
+          message: body
+        }
+      })
+    });
+    
+    if (response.ok) {
+      console.log("Email yuborildi!");
+      return true;
+    } else {
+      console.log("Email yuborilmadi");
+      return false;
+    }
+  } catch (e) {
+    console.log("Email xatosi:", e);
+    return false;
+  }
+}
 
 // LOGIN
 export function login() {
