@@ -231,7 +231,10 @@ body {
 
 <div class="header-bar no-print">
   <h2>HSK Flashcard Shuffle 🀄</h2>
-  <div id="ledClock" class="led-clock">00:00:00</div>
+  <div style="display:flex;gap:10px;align-items:center;">
+    <div id="ledClock" class="led-clock">00:00:00</div>
+    <button onclick="goBack()" style="padding:8px 16px;background:#ef4444;color:white;border:none;border-radius:6px;cursor:pointer;">← Dashboard</button>
+  </div>
 </div>
 
 <div class="controls no-print">
@@ -432,6 +435,11 @@ function startClock() {
 
   update();
   setInterval(update, 1000);
+}
+
+// ================= NAVIGATION =================
+function goBack() {
+  window.location.href = "dashboard.html";
 }
 
 // ================= INIT =================
