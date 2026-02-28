@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HSK Flashcard Shuffle</title>
+<title>HSK Words </title>
 <link rel="icon" href="favicon.ico">
 <style>
 /* ================= BASE ================= */
@@ -167,22 +167,22 @@ body {
   overflow: hidden;
 }
 
-.card.front {
-  font-size: 36px;
+.card .hanzi {
+  font-size: 24px;
   font-weight: bold;
+  margin-bottom: 2px;
 }
 
-.card.back .pinyin {
-  font-size: 11px;
-  font-weight: bold;
-  margin-bottom: 3px;
+.card .pinyin {
+  font-size: 9px;
   color: #333;
+  margin-bottom: 1px;
 }
 
-.card.back .english {
-  font-size: 7px;
+.card .english {
+  font-size: 6px;
   color: #555;
-  line-height: 1.2;
+  line-height: 1.1;
 }
 
 /* ================= PRINT STYLES ================= */
@@ -213,16 +213,16 @@ body {
     page-break-after: always;
   }
 
-  .card.front {
-    font-size: 36px;
+  .card .hanzi {
+    font-size: 22px;
   }
 
-  .card.back .pinyin {
-    font-size: 20px;
+  .card .pinyin {
+    font-size: 8px;
   }
 
-  .card.back .english {
-    font-size: 20px;
+  .card .english {
+    font-size: 5px;
   }
 }
 </style>
@@ -374,49 +374,28 @@ function renderPages(list) {
   for (let i = 0; i < list.length; i += 25) {
     const chunk = list.slice(i, i + 25);
 
-    // FRONT PAGE - Hanzi
-    const front = document.createElement("div");
-    front.className = "page";
+    // ONE PAGE - Hanzi + Pinyin + English together
+    const page = document.createElement("div");
+    page.className = "page";
 
     chunk.forEach(c => {
       const d = document.createElement("div");
-      d.className = "card front";
-      d.innerText = c.hanzi;
-      front.appendChild(d);
+      d.className = "card";
+      d.innerHTML = 
+        '<div class="hanzi">' + c.hanzi + '</div>' +
+        '<div class="pinyin">' + c.pinyin + '</div>' +
+        '<div class="english">' + c.english + '</div>';
+      page.appendChild(d);
     });
 
     // Fill empty cells
     for (let j = chunk.length; j < 25; j++) {
       const d = document.createElement("div");
-      d.className = "card front";
-      front.appendChild(d);
+      d.className = "card";
+      page.appendChild(d);
     }
 
-    area.appendChild(front);
-
-    // BACK PAGE - Pinyin + English (reversed for printing)
-    const back = document.createElement("div");
-    back.className = "page";
-
-    for (let r = 0; r < 5; r++) {
-      const row = chunk.slice(r * 5, r * 5 + 5).reverse();
-
-      row.forEach(c => {
-        const d = document.createElement("div");
-        d.className = "card back";
-        d.innerHTML = '<div class="pinyin">' + c.pinyin + '</div><div class="english">' + c.english + '</div>';
-        back.appendChild(d);
-      });
-
-      // Fill row
-      for (let j = row.length; j < 5; j++) {
-        const d = document.createElement("div");
-        d.className = "card back";
-        back.appendChild(d);
-      }
-    }
-
-    area.appendChild(back);
+    area.appendChild(page);
   }
 }
 
