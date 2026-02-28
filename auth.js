@@ -8,27 +8,33 @@ import {
   onAuthStateChanged 
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-// 🔥 Firebase config
+// ✅ FIREBASE CONFIG - o'zingiznikini qo'ying
 const firebaseConfig = {
   apiKey: "AIzaSyBT1H17hj0xNHQScoBmJkdiuAlzy0qk1uY",
   authDomain: "wuminjun-f4d97.firebaseapp.com",
   projectId: "wuminjun-f4d97",
+  storageBucket: "wuminjun-f4d97.firebasestorage.app",
+  messagingSenderId: "888774800981",
+  appId: "b4875adf0b9361dc7f86dc"
 };
-const EMAILJS_SERVICE_ID = "service_tpzfhmc";
-const EMAILJS_TEMPLATE_ID = "template_qr8x3no"; 
-const EMAILJS_PUBLIC_KEY = "D2XmGLr_S2RZK8oeJ";
 
+// ✅ Firebase initialize - FAQAT BIR MARTA
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
-// 📱 Telegram config
-const TELEGRAM_BOT_TOKEN = "8724309567:AAH1GyhzfRBnAVys0fPS9qIyB5kcilW9W00"; // BotFather dan olingan token
-const TELEGRAM_CHAT_ID = "660086073"; // Sizning chat ID
+// ✅ TELEGRAM CONFIG
+const TELEGRAM_BOT_TOKEN = "8724309567:AAH1GyhzfRBnAVys0fPS9qIyB5kcilW9W00";
+const TELEGRAM_CHAT_ID = "660086073";
 
+// ✅ EMAILJS CONFIG
+const EMAILJS_SERVICE_ID = "service_tpzfhmc";
+const EMAILJS_TEMPLATE_ID = "template_qr8x3no";
+const EMAILJS_PUBLIC_KEY = "D2XmGLr_S2RZK8oeJ";
 
-
+// ─────────────────────────────────────────
 // 📱 TELEGRAM SEND MESSAGE
+// ─────────────────────────────────────────
 export async function sendTelegram(message) {
   try {
     const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
@@ -46,7 +52,11 @@ export async function sendTelegram(message) {
   }
 }
 
+// ─────────────────────────────────────────
 // 📧 EMAIL SEND (EmailJS)
+// template_params emailjs template bilan mos bo'lishi kerak:
+// {{name}}, {{email}}, {{message}}, {{title}}
+// ─────────────────────────────────────────
 export async function sendEmail(name, email, message, title = "Contact") {
   try {
     const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
@@ -58,48 +68,51 @@ export async function sendEmail(name, email, message, title = "Contact") {
         user_id: EMAILJS_PUBLIC_KEY,
         template_params: {
           name: name,       // {{name}}
-          email: email,     // {{email}} - Reply To uchun
+          email: email,     // {{email}} - Reply To
           message: message, // {{message}}
-          title: title      // {{title}} - Subject uchun
+          title: title      // {{title}} - Subject
         }
       })
     });
-    
+
     if (response.ok) {
-      console.log("Email yuborildi!");
+      console.log("✅ Email yuborildi!");
       return true;
     } else {
-      console.log("Email yuborilmadi:", await response.text());
+      console.log("❌ Email yuborilmadi:", await response.text());
       return false;
     }
   } catch (e) {
-    console.log("Email xatosi:", e);
+    console.log("❌ Email xatosi:", e);
     return false;
   }
 }
 
-// LOGIN
+// ─────────────────────────────────────────
+// 🔐 LOGIN (Google)
+// ─────────────────────────────────────────
 export function login() {
   return signInWithPopup(auth, provider).then((result) => {
     const user = result.user;
-    
-    // Telegram ga xabar yuborish
     const now = new Date().toLocaleString("uz-UZ");
+
     sendTelegram(
       `🔐 <b>Yangi kirish!</b>\n\n` +
       `👤 <b>Ism:</b> ${user.displayName}\n` +
       `📧 <b>Email:</b> ${user.email}\n` +
       `🕐 <b>Vaqt:</b> ${now}`
     );
-    
+
     return result;
   });
 }
 
-// LOGOUT
+// ─────────────────────────────────────────
+// 👋 LOGOUT
+// ─────────────────────────────────────────
 export function logout() {
   const user = auth.currentUser;
-  
+
   if (user) {
     const now = new Date().toLocaleString("uz-UZ");
     sendTelegram(
@@ -108,13 +121,15 @@ export function logout() {
       `🕐 ${now}`
     );
   }
-  
+
   return signOut(auth).then(() => {
     window.location.replace("index.html");
   });
 }
 
-// AUTH CHECK
+// ─────────────────────────────────────────
+// 🔒 AUTH CHECK - login yo'q bo'lsa redirect
+// ─────────────────────────────────────────
 export function requireAuth(redirectTo = "index.html") {
   onAuthStateChanged(auth, (user) => {
     if (!user) {
@@ -123,7 +138,9 @@ export function requireAuth(redirectTo = "index.html") {
   });
 }
 
-// REDIRECT AGAR LOGIN BOR BO'LSA
+// ─────────────────────────────────────────
+// ➡️ REDIRECT - login bor bo'lsa redirect
+// ─────────────────────────────────────────
 export function redirectIfLoggedIn(to = "dashboard.html") {
   onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -132,16 +149,21 @@ export function redirectIfLoggedIn(to = "dashboard.html") {
   });
 }
 
-// USER INFO - oddiy (faqat ism)
+// ─────────────────────────────────────────
+// 👤 USER INFO - faqat ism
+// ─────────────────────────────────────────
 export function setUserInfo(elementId) {
   onAuthStateChanged(auth, (user) => {
     if (user) {
-      document.getElementById(elementId).innerText = "👤 " + user.displayName;
+      const el = document.getElementById(elementId);
+      if (el) el.innerText = "👤 " + user.displayName;
     }
   });
 }
 
-// USER INFO - to'liq (rasm + ism + email)
+// ─────────────────────────────────────────
+// 🖼️ USER PROFILE - rasm + ism + email
+// ─────────────────────────────────────────
 export function setUserProfile(containerId) {
   onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -159,7 +181,9 @@ export function setUserProfile(containerId) {
   });
 }
 
-// GET CURRENT USER - user obyektini qaytaradi
+// ─────────────────────────────────────────
+// 📦 GET CURRENT USER - promise qaytaradi
+// ─────────────────────────────────────────
 export function getCurrentUser() {
   return new Promise((resolve) => {
     onAuthStateChanged(auth, (user) => {
@@ -168,7 +192,9 @@ export function getCurrentUser() {
   });
 }
 
-// GET USER DATA - barcha ma'lumotlar
+// ─────────────────────────────────────────
+// 📋 GET USER DATA - barcha ma'lumotlar
+// ─────────────────────────────────────────
 export function getUserData() {
   return new Promise((resolve) => {
     onAuthStateChanged(auth, (user) => {
