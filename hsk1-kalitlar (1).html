@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HSK1 汉字 flashcard | Kalitlar bo‘yicha</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #f5f7fb;
+            padding: 20px;
+            color: #1e2b3a;
+        }
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 2.2rem;
+            text-align: center;
+            margin-bottom: 10px;
+            color: #0b3954;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+        .subhead {
+            text-align: center;
+            color: #4a5f73;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+        .filter-bar {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 50px;
+            box-shadow: 0 8px 20px rgba(0,20,30,0.08);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 35px;
+        }
+        .search-box {
+            flex: 2;
+            min-width: 240px;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 14px 20px;
+            border: none;
+            background: #f0f3f8;
+            border-radius: 40px;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.2s;
+        }
+        .search-box input:focus {
+            background: #e6ecf5;
+            box-shadow: 0 0 0 3px rgba(11,57,84,0.1);
+        }
+        .group-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+        .group-btn {
+            background: white;
+            border: 1px solid #d0ddee;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #2b4a6b;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+        .group-btn:hover {
+            background: #e3eaf3;
+            border-color: #9bb5d4;
+        }
+        .group-btn.active {
+            background: #0b3954;
+            border-color: #0b3954;
+            color: white;
+        }
+        .reset-btn {
+            background: #fff3e0;
+            border: 1px solid #ffdbb5;
+            color: #b fifteen;
+        }
+        .stats {
+            font-size: 0.95rem;
+            color: #3d5a73;
+            background: #e8f0fe;
+            padding: 5px 15px;
+            border-radius: 30px;
+        }
+        .radical-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        .group-card {
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 15px 35px -10px rgba(20,40,70,0.15);
+            overflow: hidden;
+            transition: 0.2s;
+            border: 1px solid rgba(255,255,255,0.4);
+            backdrop-filter: blur(2px);
+        }
+        .group-header {
+            background: linear-gradient(98deg, #f0f7ff 0%, #ffffff 100%);
+            padding: 18px 28px;
+            border-bottom: 1px solid #d9e5f2;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            cursor: pointer;
+        }
+        .group-header h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #0f344d;
+            letter-spacing: 0px;
+            margin-right: 15px;
+        }
+        .group-badge {
+            background: #1c5a8a;
+            color: white;
+            padding: 5px 18px;
+            border-radius: 40px;
+            font-size: 0.95rem;
+            font-weight: 400;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .group-meaning {
+            color: #436684;
+            font-size: 1.1rem;
+            margin-left: auto;
+            font-style: italic;
+        }
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 1px;
+            background: #e9eef4;
+            padding: 1px;
+        }
+        .flashcard {
+            background: white;
+            padding: 22px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: 0.15s;
+            border: 1px solid transparent;
+        }
+        .flashcard:hover {
+            background: #fafdff;
+            border-color: #b7d3f0;
+            z-index: 2;
+            box-shadow: 0 8px 15px rgba(0,30,50,0.1);
+        }
+        .hanzi {
+            font-size: 3.2rem;
+            font-weight: 400;
+            line-height: 1.2;
+            color: #001c30;
+            margin-bottom: 8px;
+        }
+        .pinyin {
+            font-size: 1.2rem;
+            color: #2c5a82;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            background: #ebf3fa;
+            padding: 4px 16px;
+            border-radius: 40px;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+        .meaning {
+            font-size: 1rem;
+            color: #1f3b4f;
+            background: #f2f2f7;
+            padding: 5px 12px;
+            border-radius: 30px;
+            width: fit-content;
+            max-width: 90%;
+            margin: 0 auto;
+        }
+        .no-match {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 50px;
+            color: #6f8fa7;
+            font-size: 1.2rem;
+        }
+        .footer-note {
+            text-align: center;
+            margin-top: 40px;
+            color: #5d768b;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🇨🇳 HSK 1 · 汉字 kalitlar</h1>
+    <div class="subhead">〓  radikal guruhlar: odam, ayol, suv, og‘iz, yurak  …  〓</div>
+
+    <div class="filter-bar">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="🔍  qidirish (hanzi, pinyin yoki ma’no)">
+        </div>
+        <div class="group-selector" id="groupFilters">
+            <button class="group-btn active" data-group="all">Hammasi</button>
+        </div>
+        <span class="stats" id="stats">255 ta</span>
+    </div>
+
+    <div id="radicalGroups" class="radical-grid">
+        <!-- JS orqali to‘ldiriladi -->
+    </div>
+    <div class="footer-note">
+        ⚡ har bir guruh — radikal (kalit) asosida · 1-15-dars so‘zlari
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ---------- FLASHCARD DATA (radikal gruppalangan) ----------
+        const groups = [
+            {
+                radical: "亻",
+                name: "人字旁",
+                meaning: "odam, inson",
+                cards: [
+                    { hanzi: "你", pinyin: "nǐ", meaning: "sen" },
+                    { hanzi: "他", pinyin: "tā", meaning: "u (erkak)" },
+                    { hanzi: "她", pinyin: "tā", meaning: "u (ayol)" },
+                    { hanzi: "们", pinyin: "men", meaning: "-lar (ko'plik)" },
+                    { hanzi: "住", pinyin: "zhù", meaning: "yashamoq, turmoq" },
+                    { hanzi: "体", pinyin: "tǐ", meaning: "tana, badan" },
+                    { hanzi: "什", pinyin: "shén", meaning: "nima (so'roq)" },
+                    { hanzi: "件", pinyin: "jiàn", meaning: "hisob so'z (kiyim)" },
+                    { hanzi: "作", pinyin: "zuò", meaning: "qilmoq, ishlamoq" }
+                ]
+            },
+            {
+                radical: "女",
+                name: "女字旁",
+                meaning: "ayol, qiz",
+                cards: [
+                    { hanzi: "妈", pinyin: "mā", meaning: "ona" },
+                    { hanzi: "姐", pinyin: "jiě", meaning: "opa" },
+                    { hanzi: "妹", pinyin: "mèi", meaning: "singil" },
+                    { hanzi: "她", pinyin: "tā", meaning: "u (ayol)" },
+                    { hanzi: "好", pinyin: "hǎo", meaning: "yaxshi" },
+                    { hanzi: "姓", pinyin: "xìng", meaning: "familiya" },
+                    { hanzi: "奶", pinyin: "nǎi", meaning: "buvi; sut" },
+                    { hanzi: "女", pinyin: "nǚ", meaning: "ayol, qiz" }
+                ]
+            },
+            {
+                radical: "口",
+                name: "口字旁",
+                meaning: "og‘iz, teshik",
+                cards: [
+                    { hanzi: "吃", pinyin: "chī", meaning: "yemoq" },
+                    { hanzi: "喝", pinyin: "hē", meaning: "ichmoq" },
+                    { hanzi: "叫", pinyin: "jiào", meaning: "chaqirmoq, nomlanmoq" },
+                    { hanzi: "唱", pinyin: "chàng", meaning: "kuylamoq" },
+                    { hanzi: "听", pinyin: "tīng", meaning: "eshitmoq" },
+                    { hanzi: "吗", pinyin: "ma", meaning: "so'roq yuklamasi" },
+                    { hanzi: "呢", pinyin: "ne", meaning: "so'roq yuklamasi" },
+                    { hanzi: "吧", pinyin: "ba", meaning: "taklif yuklamasi" },
+                    { hanzi: "啊", pinyin: "a", meaning: "undov" },
+                    { hanzi: "嘴", pinyin: "zuǐ", meaning: "og'iz" },
+                    { hanzi: "口", pinyin: "kǒu", meaning: "og'iz, hisob so'z" },
+                    { hanzi: "国", pinyin: "guó", meaning: "davlat" },
+                    { hanzi: "园", pinyin: "yuán", meaning: "bog'" },
+                    { hanzi: "回", pinyin: "huí", meaning: "qaytmoq" }
+                ]
+            },
+            {
+                radical: "氵",
+                name: "三点水",
+                meaning: "suv",
+                cards: [
+                    { hanzi: "喝", pinyin: "hē", meaning: "ichmoq" },
+                    { hanzi: "渴", pinyin: "kě", meaning: "chanqamoq" },
+                    { hanzi: "洗", pinyin: "xǐ", meaning: "yuvinmoq" },
+                    { hanzi: "澡", pinyin: "zǎo", meaning: "cho'milish" },
+                    { hanzi: "海", pinyin: "hǎi", meaning: "dengiz" },
+                    { hanzi: "河", pinyin: "hé", meaning: "daryo" },
+                    { hanzi: "没", pinyin: "méi", meaning: "yo'q" },
+                    { hanzi: "法", pinyin: "fǎ", meaning: "usul, qonun" },
+                    { hanzi: "汉", pinyin: "hàn", meaning: "xitoy" },
+                    { hanzi: "酒", pinyin: "jiǔ", meaning: "spirtli ichimlik" },
+                    { hanzi: "汽", pinyin: "qì", meaning: "bug'" },
+                    { hanzi: "泳", pinyin: "yǒng", meaning: "suzmoq" }
+                ]
+            },
+            {
+                radical: "扌",
+                name: "提手旁",
+                meaning: "qo‘l",
+                cards: [
+                    { hanzi: "打", pinyin: "dǎ", meaning: "urmoq, qilmoq" },
+                    { hanzi: "拿", pinyin: "ná", meaning: "olmoq" },
+                    { hanzi: "把", pinyin: "bǎ", meaning: "ushlamoq, hisob so'z" },
+                    { hanzi: "接", pinyin: "jiē", meaning: "qabul qilmoq, kutib olmoq" },
+                    { hanzi: "找", pinyin: "zhǎo", meaning: "qidirmoq" },
+                    { hanzi: "搬", pinyin: "bān", meaning: "ko'chirmoq" },
+                    { hanzi: "扫", pinyin: "sǎo", meaning: "supurmoq" }
+                ]
+            },
+            {
+                radical: "饣",
+                name: "食字旁",
+                meaning: "ovqat, yemak",
+                cards: [
+                    { hanzi: "吃", pinyin: "chī", meaning: "yemoq" },
+                    { hanzi: "饭", pinyin: "fàn", meaning: "ovqat" },
+                    { hanzi: "饱", pinyin: "bǎo", meaning: "to'q" },
+                    { hanzi: "饿", pinyin: "è", meaning: "och" },
+                    { hanzi: "饺", pinyin: "jiǎo", meaning: "manti" },
+                    { hanzi: "饼", pinyin: "bǐng", meaning: "non" },
+                    { hanzi: "馆", pinyin: "guǎn", meaning: "restoran, bino" }
+                ]
+            },
+            {
+                radical: "木",
+                name: "木字旁",
+                meaning: "daraxt, yog‘och",
+                cards: [
+                    { hanzi: "杯", pinyin: "bēi", meaning: "stakan, krujka" },
+                    { hanzi: "椅", pinyin: "yǐ", meaning: "stul" },
+                    { hanzi: "桌", pinyin: "zhuō", meaning: "stol" },
+                    { hanzi: "机", pinyin: "jī", meaning: "mashina, apparat" },
+                    { hanzi: "校", pinyin: "xiào", meaning: "maktab" },
+                    { hanzi: "楼", pinyin: "lóu", meaning: "bino" },
+                    { hanzi: "板", pinyin: "bǎn", meaning: "taxta" },
+                    { hanzi: "本", pinyin: "běn", meaning: "kitob, asl" }
+                ]
+            },
+            {
+                radical: "艹",
+                name: "草字头",
+                meaning: "o‘t, o‘simlik",
+                cards: [
+                    { hanzi: "菜", pinyin: "cài", meaning: "sabzavot, ovqat" },
+                    { hanzi: "草", pinyin: "cǎo", meaning: "o't" },
+                    { hanzi: "花", pinyin: "huā", meaning: "gul" },
+                    { hanzi: "茶", pinyin: "chá", meaning: "choy" },
+                    { hanzi: "苹", pinyin: "píng", meaning: "olma" },
+                    { hanzi: "蕉", pinyin: "jiāo", meaning: "banan" },
+                    { hanzi: "蓝", pinyin: "lán", meaning: "ko'k rang" },
+                    { hanzi: "节", pinyin: "jié", meaning: "bayram, bo'g'in" }
+                ]
+            },
+            {
+                radical: "讠",
+                name: "言字旁",
+                meaning: "gap, so‘z",
+                cards: [
+                    { hanzi: "说", pinyin: "shuō", meaning: "gapirmoq" },
+                    { hanzi: "话", pinyin: "huà", meaning: "gap" },
+                    { hanzi: "请", pinyin: "qǐng", meaning: "iltimos, taklif" },
+                    { hanzi: "谢", pinyin: "xiè", meaning: "rahmat aytmoq" },
+                    { hanzi: "认", pinyin: "rèn", meaning: "tanimoq" },
+                    { hanzi: "识", pinyin: "shí", meaning: "bilmoq" },
+                    { hanzi: "让", pinyin: "ràng", meaning: "ruxsat bermoq" },
+                    { hanzi: "记", pinyin: "jì", meaning: "eslamoq, yozib olmoq" },
+                    { hanzi: "谁", pinyin: "shéi", meaning: "kim" },
+                    { hanzi: "课", pinyin: "kè", meaning: "dars" },
+                    { hanzi: "语", pinyin: "yǔ", meaning: "til" },
+                    { hanzi: "词", pinyin: "cí", meaning: "so'z" },
+                    { hanzi: "读", pinyin: "dú", meaning: "o'qimoq" }
+                ]
+            },
+            {
+                radical: "辶",
+                name: "走之底",
+                meaning: "harakat, yo‘l",
+                cards: [
+                    { hanzi: "这", pinyin: "zhè", meaning: "bu" },
+                    { hanzi: "那", pinyin: "nà", meaning: "u, o'sha" },
+                    { hanzi: "边", pinyin: "biān", meaning: "tomon" },
+                    { hanzi: "过", pinyin: "guò", meaning: "o'tmoq" },
+                    { hanzi: "还", pinyin: "hái", meaning: "hali; qaytmoq" },
+                    { hanzi: "进", pinyin: "jìn", meaning: "kirmoq" },
+                    { hanzi: "近", pinyin: "jìn", meaning: "yaqin" },
+                    { hanzi: "远", pinyin: "yuǎn", meaning: "uzoq" },
+                    { hanzi: "送", pinyin: "sòng", meaning: "kuzatmoq, bermoq" },
+                    { hanzi: "遇", pinyin: "yù", meaning: "uchratmoq" }
+                ]
+            },
+            {
+                radical: "心",
+                name: "心字底",
+                meaning: "yurak, his-tuyg‘u",
+                cards: [
+                    { hanzi: "想", pinyin: "xiǎng", meaning: "o'ylamoq, xohlamoq" },
+                    { hanzi: "忘", pinyin: "wàng", meaning: "unutmoq" },
+                    { hanzi: "忙", pinyin: "máng", meaning: "band" },
+                    { hanzi: "快", pinyin: "kuài", meaning: "tez, xursand" },
+                    { hanzi: "慢", pinyin: "màn", meaning: "sekin" },
+                    { hanzi: "怕", pinyin: "pà", meaning: "qo'rqmoq" },
+                    { hanzi: "您", pinyin: "nín", meaning: "siz (hurmat)" },
+                    { hanzi: "怎", pinyin: "zěn", meaning: "qanday" },
+                    { hanzi: "急", pinyin: "jí", meaning: "shoshilmoq" }
+                ]
+            },
+            {
+                radical: "日",
+                name: "日字旁",
+                meaning: "quyosh, kun",
+                cards: [
+                    { hanzi: "时", pinyin: "shí", meaning: "vaqt" },
+                    { hanzi: "间", pinyin: "jiān", meaning: "orasida, vaqt" },
+                    { hanzi: "明", pinyin: "míng", meaning: "yorug', tushunarli" },
+                    { hanzi: "昨", pinyin: "zuó", meaning: "kecha" },
+                    { hanzi: "晚", pinyin: "wǎn", meaning: "kech" },
+                    { hanzi: "早", pinyin: "zǎo", meaning: "erta" },
+                    { hanzi: "是", pinyin: "shì", meaning: "bo'lmoq" },
+                    { hanzi: "星", pinyin: "xīng", meaning: "yulduz" },
+                    { hanzi: "春", pinyin: "chūn", meaning: "bahor" },
+                    { hanzi: "夏", pinyin: "xià", meaning: "yoz" },
+                    { hanzi: "秋", pinyin: "qiū", meaning: "kuz" },
+                    { hanzi: "冬", pinyin: "dōng", meaning: "qish" }
+                ]
+            },
+            {
+                radical: "月",
+                name: "月字旁",
+                meaning: "oy, tana a'zosi",
+                cards: [
+                    { hanzi: "月", pinyin: "yuè", meaning: "oy" },
+                    { hanzi: "朋", pinyin: "péng", meaning: "do'st" },
+                    { hanzi: "有", pinyin: "yǒu", meaning: "bor" },
+                    { hanzi: "服", pinyin: "fú", meaning: "kiyim" },
+                    { hanzi: "胖", pinyin: "pàng", meaning: "semiz" },
+                    { hanzi: "瘦", pinyin: "shòu", meaning: "ozg'in" },
+                    { hanzi: "腿", pinyin: "tuǐ", meaning: "oyoq" },
+                    { hanzi: "脚", pinyin: "jiǎo", meaning: "oyoq panjasi" },
+                    { hanzi: "脸", pinyin: "liǎn", meaning: "yuz" }
+                ]
+            },
+            {
+                radical: "足",
+                name: "足字旁",
+                meaning: "oyoq",
+                cards: [
+                    { hanzi: "跑", pinyin: "pǎo", meaning: "yugurmoq" },
+                    { hanzi: "跳", pinyin: "tiào", meaning: "sakramoq" },
+                    { hanzi: "路", pinyin: "lù", meaning: "yo'l" },
+                    { hanzi: "跟", pinyin: "gēn", meaning: "bilan, ergashmoq" },
+                    { hanzi: "踢", pinyin: "tī", meaning: "tepmoq" },
+                    { hanzi: "足", pinyin: "zú", meaning: "oyoq" }
+                ]
+            },
+            {
+                radical: "雨",
+                name: "雨字头",
+                meaning: "yomg‘ir",
+                cards: [
+                    { hanzi: "雨", pinyin: "yǔ", meaning: "yomg'ir" },
+                    { hanzi: "雪", pinyin: "xuě", meaning: "qor" },
+                    { hanzi: "云", pinyin: "yún", meaning: "bulut" },
+                    { hanzi: "电", pinyin: "diàn", meaning: "elektr" }
+                ]
+            },
+            {
+                radical: "鸟",
+                name: "鸟字旁",
+                meaning: "qush",
+                cards: [
+                    { hanzi: "鸟", pinyin: "niǎo", meaning: "qush" },
+                    { hanzi: "鸡", pinyin: "jī", meaning: "tovuq" }
+                ]
+            },
+            {
+                radical: "米",
+                name: "米字旁",
+                meaning: "guruch",
+                cards: [
+                    { hanzi: "米", pinyin: "mǐ", meaning: "guruch" },
+                    { hanzi: "糕", pinyin: "gāo", meaning: "tort" },
+                    { hanzi: "糖", pinyin: "táng", meaning: "shakar" }
+                ]
+            },
+            {
+                radical: "贝",
+                name: "贝字旁",
+                meaning: "pul, boylik",
+                cards: [
+                    { hanzi: "买", pinyin: "mǎi", meaning: "sotib olmoq" },
+                    { hanzi: "卖", pinyin: "mài", meaning: "sotmoq" },
+                    { hanzi: "贵", pinyin: "guì", meaning: "qimmat" },
+                    { hanzi: "费", pinyin: "fèi", meaning: "xarajat" }
+                ]
+            },
+            {
+                radical: "宀",
+                name: "宝盖头",
+                meaning: "tom, uy",
+                cards: [
+                    { hanzi: "家", pinyin: "jiā", meaning: "uy, oila" },
+                    { hanzi: "室", pinyin: "shì", meaning: "xona" },
+                    { hanzi: "安", pinyin: "ān", meaning: "tinch" },
+                    { hanzi: "完", pinyin: "wán", meaning: "tugamoq" },
+                    { hanzi: "客", pinyin: "kè", meaning: "mehmon" },
+                    { hanzi: "它", pinyin: "tā", meaning: "u (narsa)" },
+                    { hanzi: "字", pinyin: "zì", meaning: "harf, yozuv" },
+                    { hanzi: "写", pinyin: "xiě", meaning: "yozmoq" }
+                ]
+            },
+            {
+                radical: "门",
+                name: "门字框",
+                meaning: "eshik, darvoza",
+                cards: [
+                    { hanzi: "问", pinyin: "wèn", meaning: "so'ramoq" },
+                    { hanzi: "间", pinyin: "jiān", meaning: "orasida, xona" },
+                    { hanzi: "闻", pinyin: "wén", meaning: "eshitmoq" },
+                    { hanzi: "门", pinyin: "mén", meaning: "eshik" },
+                    { hanzi: "开", pinyin: "kāi", meaning: "ochmoq" },
+                    { hanzi: "关", pinyin: "guān", meaning: "yopmoq" }
+                ]
+            },
+            {
+                radical: "车",
+                name: "车字旁",
+                meaning: "mashina, arava",
+                cards: [
+                    { hanzi: "车", pinyin: "chē", meaning: "mashina" },
+                    { hanzi: "辆", pinyin: "liàng", meaning: "hisob so'z (mashina)" },
+                    { hanzi: "较", pinyin: "jiào", meaning: "nisbatan" }
+                ]
+            },
+            {
+                radical: "彳",
+                name: "双人旁",
+                meaning: "harakat, yo‘l",
+                cards: [
+                    { hanzi: "很", pinyin: "hěn", meaning: "juda" },
+                    { hanzi: "得", pinyin: "de", meaning: "yordamchi; olmoq" },
+                    { hanzi: "行", pinyin: "xíng", meaning: "bormoq, yaxshi" }
+                ]
+            }
+        ];
+
+        // ---------- DOM elementlari ----------
+        const container = document.getElementById('radicalGroups');
+        const groupFilterDiv = document.getElementById('groupFilters');
+        const searchInput = document.getElementById('searchInput');
+        const statsSpan = document.getElementById('stats');
+
+        let activeGroup = 'all';
+        let searchTerm = '';
+
+        // guruh tugmalarini yaratish (radikal nomlari)
+        function renderFilterButtons() {
+            const allGroups = groups.map(g => ({ radical: g.radical, name: g.name }));
+            let html = `<button class="group-btn active" data-group="all">Hammasi</button>`;
+            groups.forEach(g => {
+                html += `<button class="group-btn" data-group="${g.radical}">${g.radical} ${g.name}</button>`;
+            });
+            groupFilterDiv.innerHTML = html;
+
+            document.querySelectorAll('.group-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.group-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    activeGroup = btn.dataset.group;
+                    filterAndRender();
+                });
+            });
+        }
+
+        // filtrlash va kartalarni chizish
+        function filterAndRender() {
+            const term = searchTerm.trim().toLowerCase();
+
+            // har bir guruhni filterdan o‘tkazamiz
+            let filteredGroups = groups.map(group => {
+                // guruhdagi cardlarni filterla (search bo‘yicha)
+                const matchedCards = group.cards.filter(card =>
+                    card.hanzi.includes(term) ||
+                    card.pinyin.toLowerCase().includes(term) ||
+                    card.meaning.toLowerCase().includes(term)
+                );
+                return { ...group, matchedCards };
+            }).filter(group => {
+                // guruhni ko‘rsatish kerakmi?
+                if (activeGroup !== 'all' && group.radical !== activeGroup) return false;
+                if (term !== '' && group.matchedCards.length === 0) return false;
+                return true;
+            });
+
+            // statistika
+            let totalCards = 0;
+            filteredGroups.forEach(g => totalCards += g.matchedCards?.length || g.cards.length);
+            statsSpan.innerText = totalCards + ' ta';
+
+            // html yaratish
+            let html = '';
+            filteredGroups.forEach(group => {
+                const displayCards = term ? group.matchedCards : group.cards;
+                if (displayCards.length === 0 && term !== '') return; // bu groupda mos keladigan card yo‘q
+
+                html += `<div class="group-card">`;
+                html += `<div class="group-header">`;
+                html += `<h2>${group.radical} ${group.name}</h2>`;
+                html += `<span class="group-badge">${displayCards.length} ta</span>`;
+                html += `<span class="group-meaning">${group.meaning}</span>`;
+                html += `</div>`;
+                html += `<div class="card-container">`;
+
+                displayCards.forEach(card => {
+                    html += `<div class="flashcard">`;
+                    html += `<div class="hanzi">${card.hanzi}</div>`;
+                    html += `<div class="pinyin">${card.pinyin}</div>`;
+                    html += `<div class="meaning">${card.meaning}</div>`;
+                    html += `</div>`;
+                });
+
+                html += `</div></div>`;
+            });
+
+            if (filteredGroups.length === 0) {
+                html = `<div class="group-card"><div class="card-container"><div class="no-match">😕 Hech narsa topilmadi</div></div></div>`;
+            }
+
+            container.innerHTML = html;
+        }
+
+        // qidiruv hodisasi
+        searchInput.addEventListener('input', (e) => {
+            searchTerm = e.target.value;
+            filterAndRender();
+        });
+
+        // reset tugmasi (optional) – biz filterda "Hammasi" tugmasiga bosing
+        // init
+        renderFilterButtons();
+        filterAndRender();
+
+        // guruh sarlavhasini bosib yig‘ish / ochish (accordion) – qo‘shimcha qulaylik
+        container.addEventListener('click', (e) => {
+            const header = e.target.closest('.group-header');
+            if (!header) return;
+            const containerDiv = header.parentElement.querySelector('.card-container');
+            if (containerDiv) {
+                containerDiv.style.display = containerDiv.style.display === 'none' ? 'grid' : 'none';
+            }
+        });
+
+    })();
+</script>
+</body>
+</html>
