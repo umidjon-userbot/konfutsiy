@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HSK 1 — Nechi soat?</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=DM+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #1a1a22;
+    --surface2: #22222e;
+    --border: rgba(255,255,255,0.08);
+    --accent: #e8a84a;
+    --accent2: #5b8cf7;
+    --text: #e8e6df;
+    --text2: #8a8880;
+    --text3: #5a5856;
+    --success: #4ecb8f;
+    --danger: #e85c5c;
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding: 0 0 80px;
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, #1a1a22 0%, #0f0f17 100%);
+    border-bottom: 0.5px solid var(--border);
+    padding: 20px 24px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-inner { max-width: 720px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .title { font-size: 17px; font-weight: 600; color: var(--text); letter-spacing: -.01em; }
+  .title span { color: var(--accent); }
+  .score-pill {
+    background: var(--surface2);
+    border: 0.5px solid var(--border);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .score-pill b { color: var(--accent); }
+
+  /* Progress */
+  .progress-wrap { max-width: 720px; margin: 0 auto; padding: 10px 24px 0; }
+  .progress-bar { height: 3px; background: var(--surface2); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 99px; transition: width .4s ease; }
+  .progress-text { font-size: 12px; color: var(--text3); margin-top: 5px; }
+
+  /* Main */
+  .main { max-width: 720px; margin: 0 auto; padding: 24px 24px 0; }
+
+  /* Section title */
+  .section-head {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px;
+  }
+  .section-badge {
+    background: var(--surface2);
+    border: 0.5px solid var(--border);
+    border-radius: 6px;
+    padding: 3px 9px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: .05em;
+    text-transform: uppercase;
+  }
+  .section-desc { font-size: 13px; color: var(--text2); }
+
+  /* Question card */
+  .q-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 14px;
+    transition: border-color .2s;
+  }
+  .q-card.done { border-color: rgba(255,255,255,0.04); opacity: .85; }
+
+  .q-num { font-size: 11px; color: var(--text3); font-weight: 500; letter-spacing: .05em; text-transform: uppercase; margin-bottom: 12px; }
+
+  /* Clock */
+  .clock-wrap { display: flex; justify-content: center; margin-bottom: 16px; }
+  .clock-svg { color: var(--text); }
+
+  /* Options */
+  .options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .opt {
+    background: var(--surface2);
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text);
+    cursor: pointer;
+    text-align: center;
+    transition: background .12s, border-color .12s, transform .1s;
+    font-family: 'Noto Sans SC', 'DM Sans', sans-serif;
+  }
+  .opt:hover:not([disabled]) { background: #2a2a38; border-color: rgba(255,255,255,0.15); transform: translateY(-1px); }
+  .opt:active:not([disabled]) { transform: scale(0.98); }
+  .opt.correct { background: rgba(78,203,143,0.12); border-color: var(--success); color: var(--success); }
+  .opt.wrong   { background: rgba(232,92,92,0.12);  border-color: var(--danger);  color: var(--danger); }
+  .opt.reveal  { background: rgba(78,203,143,0.07); border-color: rgba(78,203,143,0.3); color: rgba(78,203,143,0.7); }
+
+  /* Feedback */
+  .feedback { font-size: 13px; color: var(--text2); margin-top: 10px; min-height: 20px; display: flex; align-items: center; gap: 6px; }
+  .feedback.ok  { color: var(--success); }
+  .feedback.err { color: var(--danger); }
+  .feedback-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+
+  /* Match section */
+  .match-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 14px;
+  }
+  .match-card.done { border-color: rgba(255,255,255,0.04); opacity: .85; }
+  .match-zh { font-size: 32px; font-weight: 700; font-family: 'Noto Sans SC', sans-serif; color: var(--text); text-align: center; margin-bottom: 16px; letter-spacing: .02em; }
+  .match-options { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+  .match-opt {
+    background: var(--surface2);
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 6px 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: background .12s, border-color .12s, transform .1s;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  .match-opt:hover:not([disabled]) { background: #2a2a38; border-color: rgba(255,255,255,0.15); transform: translateY(-1px); }
+  .match-opt.correct { background: rgba(78,203,143,0.12); border-color: var(--success); }
+  .match-opt.wrong   { background: rgba(232,92,92,0.12);  border-color: var(--danger); }
+  .match-opt.reveal  { background: rgba(78,203,143,0.07); border-color: rgba(78,203,143,0.3); }
+
+  /* Divider */
+  .divider { height: 0.5px; background: var(--border); margin: 28px 0 20px; }
+
+  /* Result panel */
+  .result-panel {
+    display: none;
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    text-align: center;
+    margin-top: 20px;
+  }
+  .result-panel.show { display: block; }
+  .result-big { font-size: 52px; font-weight: 700; color: var(--accent); line-height: 1; }
+  .result-sub { font-size: 15px; color: var(--text2); margin-top: 8px; }
+  .result-grade { font-size: 13px; color: var(--text3); margin-top: 6px; }
+  .retry-btn {
+    margin-top: 20px;
+    background: var(--accent);
+    color: #111;
+    border: none;
+    border-radius: 10px;
+    padding: 11px 28px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: opacity .15s, transform .1s;
+  }
+  .retry-btn:hover { opacity: .88; transform: translateY(-1px); }
+  .retry-btn:active { transform: scale(.97); }
+
+  @media(max-width:500px){
+    .match-options { grid-template-columns: repeat(2,1fr); }
+    .options { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="title">HSK 1 · <span>Nechi soat?</span> 几点了？</div>
+    <div class="score-pill">Ball: <b id="scoreTxt">0</b> / <span id="totalTxt">0</span></div>
+  </div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-bar"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
+  <div class="progress-text" id="progText">Hali boshlanmadi</div>
+</div>
+
+<div class="main" id="mainContent"></div>
+
+<script>
+// ── Data ──────────────────────────────────────────────
+const ZH_MAP = {
+  1:'一点', 2:'两点', 3:'三点', 4:'四点', 5:'五点', 6:'六点',
+  7:'七点', 8:'八点', 9:'九点', 10:'十点', 11:'十一点', 12:'十二点',
+  'h30':'点半', 'q15':'一刻'
+};
+
+function clockLabel(h, m) {
+  if (m === 0)  return ZH_MAP[h];
+  if (m === 30) return ZH_MAP[h] + ZH_MAP['h30'];
+  if (m === 15) return ZH_MAP[h] + ZH_MAP['q15'];
+  return ZH_MAP[h];
+}
+
+// All possible clock times for this test
+const ALL_CLOCKS = [
+  {h:1,m:0},{h:2,m:0},{h:3,m:0},{h:4,m:0},{h:5,m:0},{h:6,m:0},
+  {h:7,m:0},{h:8,m:0},{h:9,m:0},{h:10,m:0},{h:11,m:0},{h:12,m:0},
+  {h:3,m:30},{h:5,m:30},{h:6,m:30},{h:7,m:30},{h:9,m:30},{h:11,m:30},{h:12,m:30},
+  {h:3,m:15},{h:6,m:15},{h:9,m:15},
+];
+
+// Read-clock questions: show clock → pick Chinese label
+const READ_QUESTIONS = [
+  { ci:0,  opts:['一点','两点','三点','十二点'] },
+  { ci:1,  opts:['一点','两点','三点','四点'] },
+  { ci:2,  opts:['两点','三点','四点','五点'] },
+  { ci:3,  opts:['三点','四点','五点','六点'] },
+  { ci:4,  opts:['四点','五点','六点','七点'] },
+  { ci:5,  opts:['五点','六点','七点','八点'] },
+  { ci:6,  opts:['六点','七点','八点','九点'] },
+  { ci:7,  opts:['七点','八点','九点','十点'] },
+  { ci:8,  opts:['八点','九点','十点','十一点'] },
+  { ci:9,  opts:['九点','十点','十一点','十二点'] },
+  { ci:10, opts:['十点','十一点','十二点','一点'] },
+  { ci:11, opts:['十点','十一点','十二点','两点'] },
+  { ci:12, opts:['六点','六点半','七点','五点半'] },
+  { ci:13, opts:['五点','五点半','六点','四点半'] },
+  { ci:14, opts:['六点','六点半','七点','七点半'] },
+  { ci:15, opts:['七点','七点半','八点','六点半'] },
+  { ci:16, opts:['九点','九点半','十点','八点半'] },
+  { ci:17, opts:['十一点','十一点半','十二点','十点半'] },
+  { ci:18, opts:['十二点','十二点半','一点','十一点半'] },
+  { ci:19, opts:['三点','三点半','三点一刻','四点'] },
+  { ci:20, opts:['六点','六点半','六点一刻','七点'] },
+  { ci:21, opts:['九点','九点半','九点一刻','十点'] },
+];
+
+// Match questions: show Chinese → pick correct clock face
+const MATCH_QUESTIONS = [
+  { zh:'两点',       correct:1,  opts:[0,1,3,5] },
+  { zh:'四点',       correct:3,  opts:[2,3,5,7] },
+  { zh:'七点',       correct:6,  opts:[5,6,8,10] },
+  { zh:'十点',       correct:9,  opts:[7,9,11,1] },
+  { zh:'十二点',     correct:11, opts:[9,10,11,0] },
+  { zh:'六点半',     correct:14, opts:[12,13,14,5] },
+  { zh:'九点半',     correct:16, opts:[15,16,17,8] },
+  { zh:'十二点半',   correct:18, opts:[11,17,18,12] },
+  { zh:'三点一刻',   correct:19, opts:[2,12,19,20] },
+  { zh:'九点一刻',   correct:21, opts:[8,16,20,21] },
+];
+
+// ── Clock Drawing ──────────────────────────────────────
+function drawClock(h, m, size=86) {
+  const cx=size/2, cy=size/2, r=size/2-4;
+  const hAngle = ((h%12)+m/60)*30 - 90;
+  const mAngle = m*6 - 90;
+  const rad = d => d*Math.PI/180;
+  const hx = +(cx+(r*0.52)*Math.cos(rad(hAngle))).toFixed(2);
+  const hy = +(cy+(r*0.52)*Math.sin(rad(hAngle))).toFixed(2);
+  const mx = +(cx+(r*0.80)*Math.cos(rad(mAngle))).toFixed(2);
+  const my = +(cy+(r*0.80)*Math.sin(rad(mAngle))).toFixed(2);
+  let ticks='';
+  for(let i=0;i<60;i++){
+    const a=rad(i*6-90);
+    const isMaj=i%5===0;
+    const r1=isMaj?r-1:r-1;
+    const r2=isMaj?r-7:r-4;
+    const sw=isMaj?1.8:0.7;
+    const op=isMaj?0.65:0.25;
+    ticks+=`<line x1="${+(cx+r1*Math.cos(a)).toFixed(2)}" y1="${+(cy+r1*Math.sin(a)).toFixed(2)}" x2="${+(cx+r2*Math.cos(a)).toFixed(2)}" y2="${+(cy+r2*Math.sin(a)).toFixed(2)}" stroke="currentColor" stroke-width="${sw}" opacity="${op}"/>`;
+  }
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" class="clock-svg">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="currentColor" stroke-width="1" opacity="0.15"/>
+    <circle cx="${cx}" cy="${cy}" r="${r-1}" fill="rgba(255,255,255,0.02)"/>
+    ${ticks}
+    <line x1="${cx}" y1="${cy}" x2="${hx}" y2="${hy}" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+    <line x1="${cx}" y1="${cy}" x2="${mx}" y2="${my}" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" opacity="0.75"/>
+    <circle cx="${cx}" cy="${cy}" r="2.5" fill="currentColor" opacity="0.9"/>
+  </svg>`;
+}
+
+function drawClockSmall(h, m, size=62) {
+  const cx=size/2, cy=size/2, r=size/2-4;
+  const hAngle = ((h%12)+m/60)*30 - 90;
+  const mAngle = m*6 - 90;
+  const rad = d => d*Math.PI/180;
+  const hx = +(cx+(r*0.50)*Math.cos(rad(hAngle))).toFixed(2);
+  const hy = +(cy+(r*0.50)*Math.sin(rad(hAngle))).toFixed(2);
+  const mx = +(cx+(r*0.78)*Math.cos(rad(mAngle))).toFixed(2);
+  const my = +(cy+(r*0.78)*Math.sin(rad(mAngle))).toFixed(2);
+  let ticks='';
+  for(let i=0;i<12;i++){
+    const a=rad(i*30-90);
+    const r1=r-1, r2=r-6;
+    ticks+=`<line x1="${+(cx+r1*Math.cos(a)).toFixed(2)}" y1="${+(cy+r1*Math.sin(a)).toFixed(2)}" x2="${+(cx+r2*Math.cos(a)).toFixed(2)}" y2="${+(cy+r2*Math.sin(a)).toFixed(2)}" stroke="currentColor" stroke-width="1.5" opacity="0.5"/>`;
+  }
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" class="clock-svg">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="currentColor" stroke-width="1" opacity="0.2"/>
+    ${ticks}
+    <line x1="${cx}" y1="${cy}" x2="${hx}" y2="${hy}" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="${cx}" y1="${cy}" x2="${mx}" y2="${my}" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+    <circle cx="${cx}" cy="${cy}" r="2" fill="currentColor"/>
+  </svg>`;
+}
+
+// ── State ──────────────────────────────────────────────
+let score = 0;
+let answered = 0;
+const total = READ_QUESTIONS.length + MATCH_QUESTIONS.length;
+
+function updateScore() {
+  document.getElementById('scoreTxt').textContent = score;
+  document.getElementById('totalTxt').textContent = total;
+  const pct = Math.round(answered/total*100);
+  document.getElementById('progFill').style.width = pct+'%';
+  document.getElementById('progText').textContent = `${answered} / ${total} savol javoblandi`;
+  if(answered===total) showResult();
+}
+
+// ── Render ──────────────────────────────────────────────
+function render() {
+  const container = document.getElementById('mainContent');
+  let html = '';
+
+  // Section 1: Read clock
+  html += `<div class="section-head"><span class="section-badge">1-qism</span><span class="section-desc">Soatni ko'ring — to'g'ri javobni tanlang</span></div>`;
+
+  READ_QUESTIONS.forEach((q, i) => {
+    const c = ALL_CLOCKS[q.ci];
+    const correct = clockLabel(c.h, c.m);
+    const optsBtns = q.opts.map(o =>
+      `<button class="opt" id="ro_${i}_${o}" onclick="answerRead(${i},'${o}','${correct}')">${o}</button>`
+    ).join('');
+    html += `<div class="q-card" id="rcard${i}">
+      <div class="q-num">${i+1}. savol — nechi soat?</div>
+      <div class="clock-wrap">${drawClock(c.h, c.m)}</div>
+      <div class="options">${optsBtns}</div>
+      <div class="feedback" id="rfb${i}"></div>
+    </div>`;
+  });
+
+  html += `<div class="divider"></div>`;
+
+  // Section 2: Match
+  html += `<div class="section-head"><span class="section-badge">2-qism</span><span class="section-desc">Xitoycha vaqtni ko'ring — to'g'ri soatni tanlang</span></div>`;
+
+  MATCH_QUESTIONS.forEach((q, i) => {
+    const optsBtns = q.opts.map(idx => {
+      const c = ALL_CLOCKS[idx];
+      return `<button class="match-opt" id="mo_${i}_${idx}" onclick="answerMatch(${i},${idx},${q.correct})">${drawClockSmall(c.h,c.m)}</button>`;
+    }).join('');
+    html += `<div class="match-card" id="mcard${i}">
+      <div class="q-num">${READ_QUESTIONS.length+i+1}. savol — qaysi soat <span style="color:var(--accent2)">${q.zh}</span>?</div>
+      <div class="match-zh">${q.zh}</div>
+      <div class="match-options">${optsBtns}</div>
+      <div class="feedback" id="mfb${i}"></div>
+    </div>`;
+  });
+
+  html += `<div class="result-panel" id="resultPanel">
+    <div class="result-big" id="resultBig"></div>
+    <div class="result-sub" id="resultSub"></div>
+    <div class="result-grade" id="resultGrade"></div>
+    <button class="retry-btn" onclick="resetAll()">Qayta urinish</button>
+  </div>`;
+
+  container.innerHTML = html;
+  updateScore();
+}
+
+// ── Answer handlers ──────────────────────────────────────
+function answerRead(qi, chosen, correct) {
+  const card = document.getElementById('rcard'+qi);
+  if (card.dataset.done) return;
+  card.dataset.done = '1';
+  card.classList.add('done');
+  const isRight = chosen === correct;
+  document.getElementById('ro_'+qi+'_'+chosen).classList.add(isRight?'correct':'wrong');
+  if (!isRight) {
+    const rb = document.getElementById('ro_'+qi+'_'+correct);
+    if(rb) rb.classList.add('reveal');
+  }
+  card.querySelectorAll('.opt').forEach(b => b.setAttribute('disabled','1'));
+  const fb = document.getElementById('rfb'+qi);
+  fb.innerHTML = `<span class="feedback-dot"></span>${isRight ? "To'g'ri!" : "Noto'g'ri!"}`;
+  fb.className = 'feedback ' + (isRight?'ok':'err');
+  if (isRight) score++;
+  answered++;
+  updateScore();
+}
+
+function answerMatch(qi, chosen, correct) {
+  const card = document.getElementById('mcard'+qi);
+  if (card.dataset.done) return;
+  card.dataset.done = '1';
+  card.classList.add('done');
+  const isRight = chosen === correct;
+  document.getElementById('mo_'+qi+'_'+chosen).classList.add(isRight?'correct':'wrong');
+  if (!isRight) {
+    const rb = document.getElementById('mo_'+qi+'_'+correct);
+    if(rb) rb.classList.add('reveal');
+  }
+  card.querySelectorAll('.match-opt').forEach(b => b.setAttribute('disabled','1'));
+  const fb = document.getElementById('mfb'+qi);
+  fb.innerHTML = `<span class="feedback-dot"></span>${isRight ? "To'g'ri!" : "Noto'g'ri!"}`;
+  fb.className = 'feedback ' + (isRight?'ok':'err');
+  if (isRight) score++;
+  answered++;
+  updateScore();
+}
+
+// ── Result ──────────────────────────────────────────────
+function showResult() {
+  const panel = document.getElementById('resultPanel');
+  panel.classList.add('show');
+  const pct = Math.round(score/total*100);
+  document.getElementById('resultBig').textContent = score + ' / ' + total;
+  document.getElementById('resultSub').textContent = "Umumiy natija: " + pct + "%";
+  let grade = '', emoji = '';
+  if(pct>=90){ grade="A'lo! Siz soatlarni ajoyib bilasiz!"; emoji="🏆"; }
+  else if(pct>=75){ grade="Yaxshi! Yana bir oz mashq qiling."; emoji="🌟"; }
+  else if(pct>=50){ grade="O'rtacha. Ko'proq takrorlang."; emoji="📚"; }
+  else { grade="Yana mashq kerak. Kuchaytiring!"; emoji="💪"; }
+  document.getElementById('resultGrade').textContent = emoji + " " + grade;
+  panel.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+// ── Reset ──────────────────────────────────────────────
+function resetAll() {
+  score = 0;
+  answered = 0;
+  document.getElementById('resultPanel')?.classList.remove('show');
+  render();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// ── Init ──────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
