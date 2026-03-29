@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新HSK教程2 - Yangi so'zlar (1-15 darslar)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', 'Roboto', 'Noto Sans', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #f0f7ff 0%, #e8f0fe 100%);
+            padding: 30px 20px;
+            color: #1a2c3e;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            font-size: 2.8rem;
+            background: linear-gradient(135deg, #1a4d6b, #2c7aa0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+        .header .sub {
+            color: #3a6b8c;
+            font-size: 1.1rem;
+            border-bottom: 2px solid #c5d9f0;
+            display: inline-block;
+            padding-bottom: 8px;
+        }
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+        .stat-card {
+            background: white;
+            padding: 12px 28px;
+            border-radius: 60px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            font-weight: 600;
+            color: #1a5d7a;
+        }
+        .search-bar {
+            background: white;
+            border-radius: 60px;
+            padding: 8px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            max-width: 500px;
+            margin: 0 auto 35px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+            border: 1px solid #cde0f0;
+        }
+        .search-bar input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 14px 0;
+            font-size: 1rem;
+            background: transparent;
+        }
+        .search-bar span {
+            font-size: 1.3rem;
+            color: #6f9cbb;
+        }
+        .lesson-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+        .lesson-card {
+            background: white;
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+            transition: all 0.2s ease;
+            border: 1px solid #e2edf7;
+        }
+        .lesson-header {
+            background: linear-gradient(98deg, #f1f8ff, #fafdff);
+            padding: 20px 28px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+            border-bottom: 2px solid #dce9f5;
+        }
+        .lesson-title {
+            display: flex;
+            align-items: baseline;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .lesson-num {
+            background: #1e6f8f;
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.4rem;
+        }
+        .lesson-name {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #1d4e6e;
+        }
+        .word-count {
+            background: #e3effa;
+            padding: 6px 20px;
+            border-radius: 40px;
+            color: #1a5d7a;
+            font-weight: 500;
+        }
+        .table-wrapper {
+            padding: 0;
+            overflow-x: auto;
+        }
+        .word-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+        .word-table th {
+            background: #eef4fc;
+            padding: 16px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #1c5777;
+            border-bottom: 2px solid #cde0ef;
+        }
+        .word-table td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #e6edf4;
+            vertical-align: top;
+        }
+        .word-table tr:hover td {
+            background: #f8fbfe;
+        }
+        .hanzi {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: #003056;
+            font-family: 'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif;
+        }
+        .pinyin {
+            color: #b6581c;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        .en {
+            color: #2c6e49;
+        }
+        .uz {
+            color: #5a3e2b;
+        }
+        .toggle-icon {
+            font-size: 1.6rem;
+            color: #6499b9;
+            transition: transform 0.2s;
+        }
+        .hidden-content {
+            display: none;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 45px;
+            color: #54809b;
+            font-size: 0.85rem;
+            padding: 20px;
+            border-top: 1px solid #cde0ef;
+        }
+        @media (max-width: 700px) {
+            .lesson-name { font-size: 1.2rem; }
+            .word-table th, .word-table td { padding: 10px 6px; }
+            .hanzi { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container" id="app">
+    <div class="header">
+        <h1>📘 新HSK教程2 · Yangi so‘zlar</h1>
+        <div class="sub">HSK 3.0 二级 | 15 dars | 200+ so‘z</div>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card">📚 15 dars</div>
+        <div class="stat-card">📖 200+ yangi so‘z</div>
+        <div class="stat-card">🎯 HSK 3.0 darajasi</div>
+    </div>
+
+    <div class="search-bar">
+        <span>🔍</span>
+        <input type="text" id="searchInput" placeholder="Qidirish: hanzi, pinyin, ingliz yoki o‘zbekcha ma’no..." onkeyup="filterLessons()">
+    </div>
+
+    <div class="lesson-grid" id="lessonsGrid">
+        <!-- JS orqali to'ldiriladi -->
+    </div>
+    <div class="footer">
+        ⭐ 新HSK教程2 · Barcha yangi so‘zlar to‘liq (ingliz va o‘zbek tarjimalari bilan)
+    </div>
+</div>
+
+<script>
+    // ---------- TO'LIQ MA'LUMOTLAR (1-15 darslar) ----------
+    const lessonsData = [
+        { lesson: 1, title: "她请我们吃了北京烤鸭", words: [
+            { hanzi: "就", pinyin: "jiù", en: "exactly; precisely", uz: "aniq, aynan" },
+            { hanzi: "给", pinyin: "gěi", en: "to; for (prep.)", uz: "uchun, ga" },
+            { hanzi: "让", pinyin: "ràng", en: "let; allow", uz: "ruxsat bermoq" },
+            { hanzi: "接", pinyin: "jiē", en: "meet; receive", uz: "kutib olmoq" },
+            { hanzi: "介绍", pinyin: "jièshào", en: "introduce", uz: "tanishtirmoq" },
+            { hanzi: "有时", pinyin: "yǒushí", en: "sometimes", uz: "ba'zida" },
+            { hanzi: "懂", pinyin: "dǒng", en: "understand", uz: "tushunmoq" },
+            { hanzi: "意思", pinyin: "yìsi", en: "meaning; idea", uz: "ma'no, fikr" },
+            { hanzi: "已经", pinyin: "yǐjīng", en: "already", uz: "allaqachon" },
+            { hanzi: "不好意思", pinyin: "bù hǎoyìsi", en: "sorry; embarrassed", uz: "kechirasiz" },
+            { hanzi: "旅游", pinyin: "lǚyóu", en: "travel", uz: "sayohat" },
+            { hanzi: "帮忙", pinyin: "bāngmáng", en: "help", uz: "yordam bermoq" },
+            { hanzi: "次", pinyin: "cì", en: "time (frequency)", uz: "marta" }
+        ], proper: [{ hanzi: "北京烤鸭", pinyin: "Běijīng Kǎoyā", en: "Peking Duck", uz: "Pekin o'rdagi" }] },
+        { lesson: 2, title: "还是打车去北大吧", words: [
+            { hanzi: "但", pinyin: "dàn", en: "but", uz: "lekin" },
+            { hanzi: "打车", pinyin: "dǎchē", en: "take a taxi", uz: "taksiga chiqmoq" },
+            { hanzi: "网上", pinyin: "wǎngshang", en: "online", uz: "internetda" },
+            { hanzi: "万", pinyin: "wàn", en: "ten thousand", uz: "o'n ming" },
+            { hanzi: "外国", pinyin: "wàiguó", en: "foreign country", uz: "chet davlat" },
+            { hanzi: "教室", pinyin: "jiàoshì", en: "classroom", uz: "sinf xonasi" },
+            { hanzi: "别", pinyin: "bié", en: "don't", uz: "mang" },
+            { hanzi: "票", pinyin: "piào", en: "ticket", uz: "bilet" },
+            { hanzi: "过来", pinyin: "guòlái", en: "come here", uz: "bu yerga kelmoq" },
+            { hanzi: "远", pinyin: "yuǎn", en: "far", uz: "uzoq" },
+            { hanzi: "车站", pinyin: "chēzhàn", en: "bus stop", uz: "bekat" },
+            { hanzi: "公交车", pinyin: "gōngjiāochē", en: "bus", uz: "avtobus" },
+            { hanzi: "间", pinyin: "jiān", en: "measure word (room)", uz: "hisob so'z" }
+        ], proper: [{ hanzi: "北京大学", pinyin: "Běijīng Dàxué", en: "Peking University", uz: "Pekin universiteti" }] },
+        { lesson: 3, title: "我想去西安旅游", words: [
+            { hanzi: "回来", pinyin: "huílái", en: "come back", uz: "qaytib kelmoq" },
+            { hanzi: "这么", pinyin: "zhème", en: "so; such", uz: "shuncha" },
+            { hanzi: "完", pinyin: "wán", en: "complete", uz: "tugamoq" },
+            { hanzi: "回去", pinyin: "huíqù", en: "go back", uz: "qaytib ketmoq" },
+            { hanzi: "送", pinyin: "sòng", en: "send; give", uz: "yubormoq" },
+            { hanzi: "每", pinyin: "měi", en: "each; every", uz: "har" },
+            { hanzi: "累", pinyin: "lèi", en: "tired", uz: "charchagan" },
+            { hanzi: "一起", pinyin: "yìqǐ", en: "together", uz: "birga" },
+            { hanzi: "洗", pinyin: "xǐ", en: "wash", uz: "yuvinmoq" },
+            { hanzi: "拿", pinyin: "ná", en: "take; fetch", uz: "olmoq" },
+            { hanzi: "出去", pinyin: "chūqù", en: "go out", uz: "chiqib ketmoq" },
+            { hanzi: "手", pinyin: "shǒu", en: "hand", uz: "qo'l" },
+            { hanzi: "不错", pinyin: "búcuò", en: "not bad", uz: "yomon emas" },
+            { hanzi: "为什么", pinyin: "wèishénme", en: "why", uz: "nima uchun" }
+        ] },
+        { lesson: 4, title: "你穿红色的很好看", words: [
+            { hanzi: "过去", pinyin: "guòqù", en: "pass by", uz: "o'tib ketmoq" },
+            { hanzi: "白色", pinyin: "báisè", en: "white", uz: "oq rang" },
+            { hanzi: "红色", pinyin: "hóngsè", en: "red", uz: "qizil rang" },
+            { hanzi: "颜色", pinyin: "yánsè", en: "color", uz: "rang" },
+            { hanzi: "绿色", pinyin: "lǜsè", en: "green", uz: "yashil rang" },
+            { hanzi: "黑色", pinyin: "hēisè", en: "black", uz: "qora rang" },
+            { hanzi: "更", pinyin: "gèng", en: "more", uz: "yanada" },
+            { hanzi: "书包", pinyin: "shūbāo", en: "schoolbag", uz: "maktab sumkasi" },
+            { hanzi: "因为", pinyin: "yīnwèi", en: "because", uz: "chunki" },
+            { hanzi: "所以", pinyin: "suǒyǐ", en: "so", uz: "shuning uchun" },
+            { hanzi: "试", pinyin: "shì", en: "try", uz: "sinab ko'rmoq" },
+            { hanzi: "裤子", pinyin: "kùzi", en: "pants", uz: "shim" },
+            { hanzi: "商场", pinyin: "shāngchǎng", en: "shopping mall", uz: "savdo markazi" }
+        ] },
+        { lesson: 5, title: "第一次去中国朋友家", words: [
+            { hanzi: "下来", pinyin: "xiàlái", en: "come down", uz: "pastga tushmoq" },
+            { hanzi: "下面", pinyin: "xiàmiàn", en: "below", uz: "pastda" },
+            { hanzi: "上去", pinyin: "shàngqù", en: "go up", uz: "yuqoriga chiqmoq" },
+            { hanzi: "上来", pinyin: "shànglái", en: "come up", uz: "yuqoriga kelmoq" },
+            { hanzi: "进去", pinyin: "jìnqù", en: "go in", uz: "ichkariga kirmoq" },
+            { hanzi: "出来", pinyin: "chūlái", en: "come out", uz: "tashqariga chiqmoq" },
+            { hanzi: "带", pinyin: "dài", en: "bring", uz: "olib kelmoq" },
+            { hanzi: "礼物", pinyin: "lǐwù", en: "gift", uz: "sovg'a" },
+            { hanzi: "爷爷", pinyin: "yéye", en: "grandfather", uz: "bobo" },
+            { hanzi: "奶奶", pinyin: "nǎinai", en: "grandmother", uz: "buvi" },
+            { hanzi: "奶茶", pinyin: "nǎichá", en: "bubble tea", uz: "sutli choy" },
+            { hanzi: "跟", pinyin: "gēn", en: "with", uz: "bilan" },
+            { hanzi: "等", pinyin: "děng", en: "wait", uz: "kutmoq" },
+            { hanzi: "快", pinyin: "kuài", en: "fast", uz: "tez" },
+            { hanzi: "酒店", pinyin: "jiǔdiàn", en: "hotel", uz: "mehmonxona" }
+        ] },
+        { lesson: 6, title: "小雪，生日快乐！", words: [
+            { hanzi: "生日", pinyin: "shēngrì", en: "birthday", uz: "tug'ilgan kun" },
+            { hanzi: "忘", pinyin: "wàng", en: "forget", uz: "unutmoq" },
+            { hanzi: "画", pinyin: "huà", en: "draw", uz: "chizmoq" },
+            { hanzi: "画笔", pinyin: "huàbǐ", en: "paintbrush", uz: "bo'yoq qalam" },
+            { hanzi: "蛋糕", pinyin: "dàngāo", en: "cake", uz: "tort" },
+            { hanzi: "快乐", pinyin: "kuàilè", en: "happy", uz: "baxtli" },
+            { hanzi: "打开", pinyin: "dǎkāi", en: "open", uz: "ochmoq" },
+            { hanzi: "鱼", pinyin: "yú", en: "fish", uz: "baliq" },
+            { hanzi: "肉", pinyin: "ròu", en: "meat", uz: "go'sht" },
+            { hanzi: "床", pinyin: "chuáng", en: "bed", uz: "karavot" },
+            { hanzi: "舒服", pinyin: "shūfu", en: "comfortable", uz: "qulay" },
+            { hanzi: "长", pinyin: "cháng", en: "long", uz: "uzun" }
+        ] },
+        { lesson: 7, title: "他篮球打得很好", words: [
+            { hanzi: "从", pinyin: "cóng", en: "from", uz: "dan" },
+            { hanzi: "往", pinyin: "wǎng", en: "towards", uz: "tomon" },
+            { hanzi: "跑", pinyin: "pǎo", en: "run", uz: "yugurmoq" },
+            { hanzi: "打", pinyin: "dǎ", en: "play", uz: "o'ynamoq" },
+            { hanzi: "篮球", pinyin: "lánqiú", en: "basketball", uz: "basketbol" },
+            { hanzi: "足球", pinyin: "zúqiú", en: "soccer", uz: "futbol" },
+            { hanzi: "踢", pinyin: "tī", en: "kick", uz: "tepmoq" },
+            { hanzi: "球", pinyin: "qiú", en: "ball", uz: "to'p" },
+            { hanzi: "跑步", pinyin: "pǎobù", en: "run", uz: "yugurish" },
+            { hanzi: "游泳", pinyin: "yóuyǒng", en: "swim", uz: "suzmoq" },
+            { hanzi: "游", pinyin: "yóu", en: "swim", uz: "suzmoq" },
+            { hanzi: "爱好", pinyin: "àihào", en: "hobby", uz: "qiziqish" },
+            { hanzi: "开始", pinyin: "kāishǐ", en: "start", uz: "boshlamoq" }
+        ] },
+        { lesson: 8, title: "虽然你忘了，但是我记得", words: [
+            { hanzi: "比", pinyin: "bǐ", en: "than", uz: "qaraganda" },
+            { hanzi: "记得", pinyin: "jìde", en: "remember", uz: "eslamoq" },
+            { hanzi: "爱情片", pinyin: "àiqíngpiàn", en: "romantic movie", uz: "romantik film" },
+            { hanzi: "有意思", pinyin: "yǒuyìsi", en: "interesting", uz: "qiziqarli" },
+            { hanzi: "虽然", pinyin: "suīrán", en: "although", uz: "garchi" },
+            { hanzi: "但是", pinyin: "dànshì", en: "but", uz: "lekin" },
+            { hanzi: "妻子", pinyin: "qīzi", en: "wife", uz: "xotin" },
+            { hanzi: "丈夫", pinyin: "zhàngfu", en: "husband", uz: "er" },
+            { hanzi: "饭馆", pinyin: "fànguǎn", en: "restaurant", uz: "restoran" },
+            { hanzi: "手表", pinyin: "shǒubiǎo", en: "watch", uz: "qo'l soati" },
+            { hanzi: "花", pinyin: "huā", en: "spend", uz: "sarflamoq" },
+            { hanzi: "左边", pinyin: "zuǒbiān", en: "left side", uz: "chap tomon" },
+            { hanzi: "右边", pinyin: "yòubiān", en: "right side", uz: "o'ng tomon" }
+        ] },
+        { lesson: 9, title: "我去买杯奶茶", words: [
+            { hanzi: "坏", pinyin: "huài", en: "broken", uz: "buzilgan" },
+            { hanzi: "这么", pinyin: "zhème", en: "so", uz: "shuncha" },
+            { hanzi: "那么", pinyin: "nàme", en: "so", uz: "shuncha" },
+            { hanzi: "离", pinyin: "lí", en: "from", uz: "dan uzoq" },
+            { hanzi: "旁边", pinyin: "pángbiān", en: "side", uz: "yon" },
+            { hanzi: "走路", pinyin: "zǒulù", en: "walk", uz: "piyoda yurmoq" },
+            { hanzi: "这样", pinyin: "zhèyàng", en: "like this", uz: "shunday" },
+            { hanzi: "门口", pinyin: "ménkǒu", en: "doorway", uz: "eshik oldi" },
+            { hanzi: "咖啡", pinyin: "kāfēi", en: "coffee", uz: "kofe" },
+            { hanzi: "近", pinyin: "jìn", en: "near", uz: "yaqin" },
+            { hanzi: "个子", pinyin: "gèzi", en: "height", uz: "bo'y" },
+            { hanzi: "高", pinyin: "gāo", en: "tall", uz: "baland" },
+            { hanzi: "男孩儿", pinyin: "nánháir", en: "boy", uz: "o'g'il bola" }
+        ] },
+        { lesson: 10, title: "就要考试了", words: [
+            { hanzi: "开学", pinyin: "kāixué", en: "school starts", uz: "maktab ochilmoq" },
+            { hanzi: "后面", pinyin: "hòumiàn", en: "behind", uz: "orqada" },
+            { hanzi: "考", pinyin: "kǎo", en: "take an exam", uz: "imtihon olmoq" },
+            { hanzi: "考试", pinyin: "kǎoshì", en: "exam", uz: "imtihon" },
+            { hanzi: "词", pinyin: "cí", en: "word", uz: "so'z" },
+            { hanzi: "本子", pinyin: "běnzi", en: "notebook", uz: "daftar" },
+            { hanzi: "错", pinyin: "cuò", en: "wrong", uz: "xato" },
+            { hanzi: "题", pinyin: "tí", en: "question", uz: "savol" },
+            { hanzi: "还是", pinyin: "háishi", en: "or", uz: "yoki" },
+            { hanzi: "快要", pinyin: "kuàiyào", en: "about to", uz: "oz qoldi" },
+            { hanzi: "笑", pinyin: "xiào", en: "smile", uz: "kulmoq" }
+        ] },
+        { lesson: 11, title: "我最喜欢吃中国菜", words: [
+            { hanzi: "疼", pinyin: "téng", en: "hurt", uz: "og'rimoq" },
+            { hanzi: "身体", pinyin: "shēntǐ", en: "body", uz: "tana" },
+            { hanzi: "动", pinyin: "dòng", en: "move", uz: "harakatlanmoq" },
+            { hanzi: "路上", pinyin: "lùshang", en: "on the road", uz: "yo'lda" },
+            { hanzi: "慢", pinyin: "màn", en: "slow", uz: "sekin" },
+            { hanzi: "经常", pinyin: "jīngcháng", en: "often", uz: "tez-tez" },
+            { hanzi: "药", pinyin: "yào", en: "medicine", uz: "dori" },
+            { hanzi: "药店", pinyin: "yàodiàn", en: "pharmacy", uz: "apteka" },
+            { hanzi: "头", pinyin: "tóu", en: "head", uz: "bosh" },
+            { hanzi: "最", pinyin: "zuì", en: "most", uz: "eng" }
+        ] },
+        { lesson: 12, title: "这里比北京冷多了", words: [
+            { hanzi: "事情", pinyin: "shìqing", en: "matter", uz: "ish" },
+            { hanzi: "晴", pinyin: "qíng", en: "sunny", uz: "quyoshli" },
+            { hanzi: "正", pinyin: "zhèng", en: "just happening", uz: "hozir" },
+            { hanzi: "外面", pinyin: "wàimiàn", en: "outside", uz: "tashqari" },
+            { hanzi: "阴", pinyin: "yīn", en: "cloudy", uz: "bulutli" },
+            { hanzi: "从小", pinyin: "cóngxiǎo", en: "since childhood", uz: "bolalikdan" },
+            { hanzi: "地铁", pinyin: "dìtiě", en: "subway", uz: "metro" },
+            { hanzi: "楼", pinyin: "lóu", en: "building", uz: "bino" },
+            { hanzi: "站", pinyin: "zhàn", en: "stop", uz: "bekat" },
+            { hanzi: "小时候", pinyin: "xiǎoshíhou", en: "childhood", uz: "bolalik" },
+            { hanzi: "好", pinyin: "hǎo", en: "very", uz: "juda" }
+        ] },
+        { lesson: 13, title: "我们爱上中文课", words: [
+            { hanzi: "新年", pinyin: "xīnnián", en: "New Year", uz: "Yangi yil" },
+            { hanzi: "教", pinyin: "jiào", en: "teach", uz: "o'rgatmoq" },
+            { hanzi: "花", pinyin: "huā", en: "flower", uz: "gul" },
+            { hanzi: "希望", pinyin: "xīwàng", en: "hope", uz: "umid qilmoq" },
+            { hanzi: "上面", pinyin: "shàngmiàn", en: "on top", uz: "ustida" },
+            { hanzi: "洗手间", pinyin: "xǐshǒujiān", en: "restroom", uz: "hojatxona" },
+            { hanzi: "里面", pinyin: "lǐmiàn", en: "inside", uz: "ichida" },
+            { hanzi: "笔", pinyin: "bǐ", en: "stroke", uz: "qalam" },
+            { hanzi: "可能", pinyin: "kěnéng", en: "probably", uz: "mumkin" },
+            { hanzi: "上网", pinyin: "shàngwǎng", en: "go online", uz: "internetga kirmoq" },
+            { hanzi: "那样", pinyin: "nàyàng", en: "so that", uz: "shunday" },
+            { hanzi: "告诉", pinyin: "gàosu", en: "tell", uz: "aytmoq" },
+            { hanzi: "班", pinyin: "bān", en: "class", uz: "sinf" }
+        ] },
+        { lesson: 14, title: "一个人过年多没意思啊", words: [
+            { hanzi: "站", pinyin: "zhàn", en: "stand", uz: "turmoq" },
+            { hanzi: "包", pinyin: "bāo", en: "bag", uz: "sumka" },
+            { hanzi: "跳舞", pinyin: "tiàowǔ", en: "dance", uz: "raqs tushmoq" },
+            { hanzi: "姓", pinyin: "xìng", en: "surname", uz: "familiya" },
+            { hanzi: "眼睛", pinyin: "yǎnjing", en: "eye", uz: "ko'z" },
+            { hanzi: "位", pinyin: "wèi", en: "measure word (people)", uz: "hisob so'z" },
+            { hanzi: "房子", pinyin: "fángzi", en: "house", uz: "uy" },
+            { hanzi: "小孩儿", pinyin: "xiǎoháir", en: "child", uz: "bola" },
+            { hanzi: "女孩儿", pinyin: "nǚháir", en: "girl", uz: "qiz bola" }
+        ] },
+        { lesson: 15, title: "我想再去一次中国", words: [
+            { hanzi: "姓名", pinyin: "xìngmíng", en: "name", uz: "ism va familiya" },
+            { hanzi: "出国", pinyin: "chūguó", en: "go abroad", uz: "chetga chiqmoq" },
+            { hanzi: "门票", pinyin: "ménpiào", en: "entrance ticket", uz: "kirish bileti" },
+            { hanzi: "高中", pinyin: "gāozhōng", en: "high school", uz: "o'rta maktab" },
+            { hanzi: "出门", pinyin: "chūmén", en: "leave home", uz: "uydan chiqmoq" },
+            { hanzi: "路", pinyin: "lù", en: "road", uz: "yo'l" },
+            { hanzi: "机票", pinyin: "jīpiào", en: "airplane ticket", uz: "samolyot bileti" },
+            { hanzi: "好像", pinyin: "hǎoxiàng", en: "be like", uz: "o'xshamoq" },
+            { hanzi: "鸟", pinyin: "niǎo", en: "bird", uz: "qush" },
+            { hanzi: "机场", pinyin: "jīchǎng", en: "airport", uz: "aeroport" },
+            { hanzi: "飞", pinyin: "fēi", en: "fly", uz: "uchmoq" }
+        ], proper: [{ hanzi: "颐和园", pinyin: "Yíhé Yuán", en: "Summer Palace", uz: "Yiheyuan bog'i" }] }
+    ];
+
+    // Render qilish
+    function renderLessons(filter = "") {
+        const container = document.getElementById("lessonsGrid");
+        let html = "";
+        const term = filter.trim().toLowerCase();
+
+        lessonsData.forEach(lesson => {
+            // So'zlarni filtrlash (qidiruv bo'yicha)
+            let filteredWords = lesson.words;
+            let filteredProper = lesson.proper ? [...lesson.proper] : [];
+            
+            if (term !== "") {
+                filteredWords = lesson.words.filter(w => 
+                    w.hanzi.includes(term) || 
+                    w.pinyin.toLowerCase().includes(term) || 
+                    w.en.toLowerCase().includes(term) || 
+                    w.uz.toLowerCase().includes(term)
+                );
+                if (lesson.proper) {
+                    filteredProper = lesson.proper.filter(p => 
+                        p.hanzi.includes(term) || 
+                        p.pinyin.toLowerCase().includes(term) || 
+                        p.en.toLowerCase().includes(term) || 
+                        p.uz.toLowerCase().includes(term)
+                    );
+                }
+                if (filteredWords.length === 0 && filteredProper.length === 0) return;
+            }
+
+            // Dars kartasini yaratish
+            html += `<div class="lesson-card" data-lesson="${lesson.lesson}">`;
+            html += `<div class="lesson-header" onclick="toggleLesson(this)">`;
+            html += `<div class="lesson-title">`;
+            html += `<span class="lesson-num">${lesson.lesson}</span>`;
+            html += `<span class="lesson-name">${lesson.title}</span>`;
+            html += `</div>`;
+            html += `<div class="word-count">📖 ${filteredWords.length + filteredProper.length} ta so‘z</div>`;
+            html += `<span class="toggle-icon">▼</span>`;
+            html += `</div>`;
+            
+            html += `<div class="table-wrapper hidden-content">`;
+            html += `<table class="word-table">`;
+            html += `<thead><tr><th>汉字</th><th>Pinyin</th><th>English</th><th>O‘zbekcha</th></tr></thead><tbody>`;
+            
+            filteredWords.forEach(w => {
+                html += `<tr>`;
+                html += `<td class="hanzi">${w.hanzi}</td>`;
+                html += `<td class="pinyin">${w.pinyin}</td>`;
+                html += `<td class="en">${w.en}</td>`;
+                html += `<td class="uz">${w.uz}</td>`;
+                html += `</tr>`;
+            });
+            
+            if (filteredProper.length > 0) {
+                filteredProper.forEach(p => {
+                    html += `<tr style="background:#fef9e6;">`;
+                    html += `<td class="hanzi">${p.hanzi} 🏛️</td>`;
+                    html += `<td class="pinyin">${p.pinyin}</td>`;
+                    html += `<td class="en">${p.en}</td>`;
+                    html += `<td class="uz">${p.uz}</td>`;
+                    html += `</tr>`;
+                });
+            }
+            
+            html += `</tbody></table>`;
+            html += `</div></div>`;
+        });
+        
+        if (html === "") {
+            html = `<div style="text-align:center; padding:60px; background:white; border-radius:40px;">🔍 Hech narsa topilmadi. Iltimos, boshqa so‘z bilan qidiring.</div>`;
+        }
+        container.innerHTML = html;
+    }
+
+    function toggleLesson(header) {
+        const wrapper = header.nextElementSibling;
+        const icon = header.querySelector('.toggle-icon');
+        if (wrapper.classList.contains('hidden-content')) {
+            wrapper.classList.remove('hidden-content');
+            icon.innerHTML = '▲';
+            icon.style.transform = 'rotate(0deg)';
+        } else {
+            wrapper.classList.add('hidden-content');
+            icon.innerHTML = '▼';
+        }
+    }
+
+    function filterLessons() {
+        const input = document.getElementById("searchInput");
+        renderLessons(input.value);
+    }
+
+    // Boshlang'ich render
+    renderLessons("");
+</script>
+</body>
+</html>
